@@ -34,8 +34,8 @@ public class AuthService {
         }
     }
 
-    public String logout(){
-        return "logout !!";
+    public void logout(String jwt){
+        jwtUtils.blackListToken(jwt);
     }
 
     public String generateJwt(String userEmail){

@@ -5,9 +5,11 @@ import com.ensias.eldycare.authenticationservice.model.AuthModel;
 import com.ensias.eldycare.authenticationservice.model.controller_params.LoginParams;
 import com.ensias.eldycare.authenticationservice.model.controller_params.RegisterParams;
 import com.ensias.eldycare.authenticationservice.service.AuthService;
+import com.ensias.eldycare.authenticationservice.utils.jwt.JwtUtils;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.validation.annotation.Validated;
@@ -20,7 +22,6 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     private final AuthService authService;
     private final Logger LOG = LoggerFactory.getLogger(AuthController.class);
-
 
     @GetMapping
     public ResponseEntity<?> hello(){
@@ -49,14 +50,27 @@ public class AuthController {
     }
 
     @PostMapping("/validate-jwt")
-    public  ResponseEntity<?> validateJWT(String JWT){
+    public  ResponseEntity<?> validateJWT(@RequestHeader(HttpHeaders.AUTHORIZATION) String JwtHeader){
+        String JWT = JwtUtils.extractJwt(JwtHeader);
         boolean isValid = authService.validateJWT(JWT);
-        if (!isValid) return ResponseEntity.badRequest().body("Invalid JWT");
-        return ResponseEntity.ok("valid JWT");
+        if (!isValid) return ResponseEntity.internalServerError().body("Invalid JWT : " + JWT);
+        return ResponseEntity.ok("valid JWT : " + JWT);
     }
 
     @PostMapping("/logout")
-    public  ResponseEntity<?> logout(){
-        return ResponseEntity.ok("logout !!");
+    public  ResponseEntity<?> logout(@RequestHeader(HttpHeaders.AUTHORIZATION) String jwt){
+        try {
+            String tokenPrefix = "Bearer ";
+            if (!jwt.startsWith(tokenPrefix)){
+                LOG.warn("Invalid token syntax: " + jwt);
+                throw new RuntimeException("Invalid token");
+            }
+            jwt = jwt.substring(tokenPrefix.length());
+            authService.logout(jwt);
+        } catch (RuntimeException e) {
+            LOG.warn(e.getMessage());
+            return ResponseEntity.internalServerError().body("Invalid Token");
+        }
+        return ResponseEntity.ok().body("Logged out");
     }
 }

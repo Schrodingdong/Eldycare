@@ -29,7 +29,7 @@ public class JwtUtils {
 
     /**
      * Generates a JWT auth token for a given user email
-     * @param user user model containing the email
+     * @param userEmail User email
      * @return JWT string
      * */
     public String generateToken(String userEmail){
