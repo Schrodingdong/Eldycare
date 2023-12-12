@@ -1,10 +1,11 @@
 package com.ensias.eldycare.authenticationservice.model;
 
+import com.ensias.eldycare.authenticationservice.model.controller_params.UserType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,13 +19,12 @@ public class AuthModel {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     private long id;
-    @NotEmpty
-    @NotNull
+    @NotBlank
     private String username;
-    @NotEmpty
-    @NotNull
+    @NotBlank
     private String email;
-    @NotEmpty
-    @NotNull
+    @NotBlank
     private String password;
+    @NotNull
+    private UserType userType;
 }

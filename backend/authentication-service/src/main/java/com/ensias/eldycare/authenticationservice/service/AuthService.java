@@ -16,7 +16,11 @@ public class AuthService {
     private final JwtUtils jwtUtils;
     private final Logger LOG = LoggerFactory.getLogger(AuthService.class);
 
-    public AuthModel register(AuthModel authModel){
+    public AuthModel register(AuthModel authModel) throws RuntimeException{
+        // check Mails
+        if (authRepository.existsByEmail(authModel.getEmail())){
+            throw new RuntimeException("The email is already registered");
+        }
         return authRepository.save(authModel);
     }
     public String login(LoginParams loginParams) throws RuntimeException{

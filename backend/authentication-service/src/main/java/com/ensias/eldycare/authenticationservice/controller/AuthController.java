@@ -34,6 +34,7 @@ public class AuthController {
         authModel.setEmail(registerParams.getEmail());
         authModel.setPassword(registerParams.getPassword());
         authModel.setUsername(registerParams.getUsername());
+        authModel.setUserType(registerParams.getUserType());
         LOG.info("Authentication model : " + authModel);
         try{
             authModel = authService.register(authModel);
@@ -49,7 +50,7 @@ public class AuthController {
         return ResponseEntity.ok(JWT);
     }
 
-    @PostMapping("/validate-jwt")
+    @GetMapping("/validate-jwt")
     public  ResponseEntity<?> validateJWT(@RequestHeader(HttpHeaders.AUTHORIZATION) String JwtHeader){
         String JWT = JwtUtils.extractJwt(JwtHeader);
         boolean isValid = authService.validateJWT(JWT);
@@ -57,7 +58,7 @@ public class AuthController {
         return ResponseEntity.ok("valid JWT : " + JWT);
     }
 
-    @PostMapping("/logout")
+    @GetMapping("/logout")
     public  ResponseEntity<?> logout(@RequestHeader(HttpHeaders.AUTHORIZATION) String jwt){
         try {
             String tokenPrefix = "Bearer ";
