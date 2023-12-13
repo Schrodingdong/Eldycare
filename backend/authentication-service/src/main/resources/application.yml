@@ -2,8 +2,14 @@ spring:
   application:
     name: authentication-service
 server:
-  port: 8888
+  port: 8080
 
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://discovery:8761/eureka
+    registerWithEureka: true
+    fetchRegistry: true
 
 jwt:
   secret: ${random.value}
