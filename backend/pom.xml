@@ -9,11 +9,11 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.ensias.eldycare</groupId>
-    <artifactId>api-gateway-service</artifactId>
+    <artifactId>eldycare-backend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>api-gateway-service</name>
-    <description>api-gateway-service</description>
-
+    <name>eldycare-backend</name>
+    <description>eldycare-backend</description>
+    <packaging>pom</packaging>
 
     <modules>
         <module>api-gateway-service</module>
