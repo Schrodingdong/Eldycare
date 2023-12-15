@@ -61,4 +61,12 @@ public class AuthService {
             return false;
         }
     }
+
+    public Object getUserType(String email) {
+        AuthModel authModel = authRepository.findByEmail(email);
+        if (authModel != null){
+            return authModel.getUserType();
+        }
+        return null;
+    }
 }

@@ -6,6 +6,8 @@ import com.ensias.eldycare.authenticationservice.model.controller_params.LoginPa
 import com.ensias.eldycare.authenticationservice.model.controller_params.RegisterParams;
 import com.ensias.eldycare.authenticationservice.service.AuthService;
 import com.ensias.eldycare.authenticationservice.utils.jwt.JwtUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     private final AuthService authService;
     private final Logger LOG = LoggerFactory.getLogger(AuthController.class);
+    private final ObjectMapper objectMapper;
 
     @GetMapping
     public ResponseEntity<?> hello(){
@@ -41,25 +44,47 @@ public class AuthController {
         } catch (Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }
-        return ResponseEntity.ok("Successfully registered !\n" + authModel);
+        ObjectNode rootNode = objectMapper.createObjectNode();
+        rootNode.put("message", "Successfully registered !");
+
+        ObjectNode authModelNode = objectMapper.createObjectNode();
+        authModelNode.put("id", authModel.getId());
+        authModelNode.put("username", authModel.getUsername());
+        authModelNode.put("email", authModel.getEmail());
+        authModelNode.put("userType", authModel.getUserType().toString());
+
+        rootNode.set("user", authModelNode);
+
+        return ResponseEntity.ok(rootNode);
     }
 
     @PostMapping("/login")
     public  ResponseEntity<?> login(@Validated @RequestBody LoginParams loginParams){
         String JWT = authService.login(loginParams);
-        return ResponseEntity.ok(JWT);
+
+        ObjectNode rootNode = objectMapper.createObjectNode();
+        rootNode.put("message", "Successfully logged in !");
+        rootNode.put("jwt", JWT);
+        rootNode.put("userType", authService.getUserType(loginParams.getEmail()).toString());
+
+        return ResponseEntity.ok(rootNode);
     }
 
     @GetMapping("/validate-jwt")
     public  ResponseEntity<?> validateJWT(@RequestHeader(HttpHeaders.AUTHORIZATION) String JwtHeader){
         String JWT = JwtUtils.extractJwt(JwtHeader);
         boolean isValid = authService.validateJWT(JWT);
-        if (!isValid) return ResponseEntity.internalServerError().body("Invalid JWT : " + JWT);
-        return ResponseEntity.ok("valid JWT : " + JWT);
+
+        ObjectNode rootNode = objectMapper.createObjectNode();
+        rootNode.put("isValid", isValid);
+
+        if (!isValid) return ResponseEntity.internalServerError().body(rootNode);
+        return ResponseEntity.ok(rootNode);
     }
 
     @GetMapping("/logout")
     public  ResponseEntity<?> logout(@RequestHeader(HttpHeaders.AUTHORIZATION) String jwt){
+        ObjectNode rootNode = objectMapper.createObjectNode();
         try {
             String tokenPrefix = "Bearer ";
             if (!jwt.startsWith(tokenPrefix)){
@@ -68,10 +93,11 @@ public class AuthController {
             }
             jwt = jwt.substring(tokenPrefix.length());
             authService.logout(jwt);
+            rootNode.put("message", "Successfully logged out !");
         } catch (RuntimeException e) {
             LOG.warn(e.getMessage());
             return ResponseEntity.internalServerError().body("Invalid Token");
         }
-        return ResponseEntity.ok().body("Logged out");
+        return ResponseEntity.ok().body(rootNode);
     }
 }
