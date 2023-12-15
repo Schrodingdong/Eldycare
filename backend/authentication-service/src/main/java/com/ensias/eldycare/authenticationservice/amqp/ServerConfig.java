@@ -1,4 +1,4 @@
-package com.ensias.eldycare.apigatewayservice.amqp;
+package com.ensias.eldycare.authenticationservice.amqp;
 
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
@@ -6,25 +6,26 @@ import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.stereotype.Component;
 
-@Configuration
-public class SenderConfiguration {
+/**
+ * This class is used to configure the RabbitMQ server for RPC pattern for JWT validation
+ */
+@Component
+public class ServerConfig {
     @Value("${amqp.auth.queue}")
     private String queueName;
     @Value("${amqp.auth.exchange}")
     private String exchangeName;
-    private boolean isDurable = true;
 
     @Bean
     public DirectExchange directExchange(){
-        return new DirectExchange(exchangeName, isDurable, false);
+        return new DirectExchange(exchangeName);
     }
 
     @Bean
     public Queue queue(){
-        return new Queue(queueName, isDurable);
+        return new Queue(queueName);
     }
 
     @Bean
@@ -32,6 +33,6 @@ public class SenderConfiguration {
         return BindingBuilder
                 .bind(queue)
                 .to(directExchange)
-                .with(queueName);
+                .with("rpc");
     }
 }

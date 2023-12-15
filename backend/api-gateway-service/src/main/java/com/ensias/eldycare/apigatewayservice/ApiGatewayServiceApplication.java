@@ -29,10 +29,11 @@ public class ApiGatewayServiceApplication {
         return builder.routes()
                 .route(r -> r.path("/auth/**")
                         .uri("lb://AUTHENTICATION-SERVICE"))
-//                .route(r -> r.path("/quote/**")
-//                        .filters(f -> f
-//                                .filter(filter))
-//                        .uri("lb://QUOTE-MANAGER-SERVICE"))
+                .route(r -> r.path("/filter-test/**")
+                        .filters(f -> f
+                                .filter(filter))
+                        .uri("lb://AUTHENTICATION-SERVICE"))
                 .build();
     }
+
 }

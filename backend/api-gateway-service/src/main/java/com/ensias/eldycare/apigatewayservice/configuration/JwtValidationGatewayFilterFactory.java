@@ -44,21 +44,9 @@ public class JwtValidationGatewayFilterFactory
             String extractedJwt = JwtUtils.extractJwt(jwt);
             // JWT Send for validation
             IS_JWT_VALID = null;
-            Message response = queue.sendAndReceive(extractedJwt);
-            String responseString = new String(response.getBody());
-            LOG.info("Response from JWT validation: " + responseString);
-            // Waiting for response
-            while(IS_JWT_VALID == null && count < MAX_COUNT){
-                try {
-                    Thread.sleep(100);
-                    count++;
-                } catch (InterruptedException e) {
-                    LOG.error("Error while waiting for JWT validation response: " + e.getMessage());
-                }
-            }
-            // Check response
-            if(!IS_JWT_VALID){
-                LOG.warn("JWT is not valid !");
+            boolean response = queue.send(extractedJwt);
+            LOG.info("Response from JWT validation: " + response);
+            if(!response){
                 exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
                 return exchange.getResponse().setComplete();
             }

@@ -14,3 +14,8 @@ eureka:
 
 jwt:
   secret: ${random.value}
+
+amqp:
+  auth:
+    queue: auth-queue
+    exchange: auth-exchange
