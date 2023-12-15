@@ -1,5 +1,7 @@
 package com.ensias.eldycare.apigatewayservice.amqp;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
@@ -13,6 +15,7 @@ public class QueueSendAndReceive {
     private DirectExchange directExchange;
     @Autowired
     private RabbitTemplate rabbitTemplate;
+    private final Logger LOG = LoggerFactory.getLogger(QueueSendAndReceive.class);
 
     /**
      * true if validation is successful, false otherwise

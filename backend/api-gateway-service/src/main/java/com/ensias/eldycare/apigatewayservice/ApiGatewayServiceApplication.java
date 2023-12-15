@@ -33,6 +33,10 @@ public class ApiGatewayServiceApplication {
                         .filters(f -> f
                                 .filter(filter))
                         .uri("lb://AUTHENTICATION-SERVICE"))
+                .route(r -> r.path("/users/**")
+                        .filters(f -> f
+                                .filter(filter))
+                        .uri("lb://USER-SERVICE"))
                 .build();
     }
 
