@@ -15,7 +15,6 @@ public class QueueSendAndReceive {
     private DirectExchange directExchange;
     @Autowired
     private RabbitTemplate rabbitTemplate;
-    private final Logger LOG = LoggerFactory.getLogger(QueueSendAndReceive.class);
 
     /**
      * true if validation is successful, false otherwise

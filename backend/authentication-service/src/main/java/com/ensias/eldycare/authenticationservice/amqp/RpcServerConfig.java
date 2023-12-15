@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
  * This class is used to configure the RabbitMQ server for RPC pattern for JWT validation
  */
 @Component
-public class ServerConfig {
+public class RpcServerConfig {
     @Value("${amqp.auth.queue}")
     private String queueName;
     @Value("${amqp.auth.exchange}")

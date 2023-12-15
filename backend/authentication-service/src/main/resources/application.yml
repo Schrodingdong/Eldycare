@@ -19,3 +19,6 @@ amqp:
   auth:
     queue: auth-queue
     exchange: auth-exchange
+  user:
+    queue: user-queue
+    exchange: user-exchange

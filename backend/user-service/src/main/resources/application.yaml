@@ -9,7 +9,9 @@ spring:
       password: ${NEO4J_PASSWORD}
   application:
     name: user-service
-
+amqp:
+  user:
+    queue: user-queue
 eureka:
   client:
     serviceUrl:

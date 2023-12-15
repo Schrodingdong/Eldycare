@@ -9,10 +9,10 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
 @Component
-public class amqp {
+public class ValidationAmqpListener {
     @Autowired
     private AuthService authService;
-    private final Logger LOG = LoggerFactory.getLogger(amqp.class);
+    private final Logger LOG = LoggerFactory.getLogger(ValidationAmqpListener.class);
 
     @RabbitListener(queues = "${amqp.auth.queue}")
     public boolean validateJwt(@Payload String jwt) {

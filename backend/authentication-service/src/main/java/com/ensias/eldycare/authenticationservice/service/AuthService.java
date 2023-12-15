@@ -1,5 +1,7 @@
 package com.ensias.eldycare.authenticationservice.service;
 
+import com.ensias.eldycare.authenticationservice.amqp.UserServiceAmqpSaveUser;
+import com.ensias.eldycare.authenticationservice.amqp.model.UserModel;
 import com.ensias.eldycare.authenticationservice.model.AuthModel;
 import com.ensias.eldycare.authenticationservice.model.controller_params.LoginParams;
 import com.ensias.eldycare.authenticationservice.repository.AuthRepository;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class AuthService {
     private final AuthRepository authRepository;
+    private final UserServiceAmqpSaveUser userServiceAmqpSaveUser;
     private final JwtUtils jwtUtils;
     private final Logger LOG = LoggerFactory.getLogger(AuthService.class);
 
@@ -21,8 +24,12 @@ public class AuthService {
         if (authRepository.existsByEmail(authModel.getEmail())){
             throw new RuntimeException("The email is already registered");
         }
+        // save user to User-Service
+        UserModel userModel = new UserModel(authModel);
+        userServiceAmqpSaveUser.saveUser(userModel);
         return authRepository.save(authModel);
     }
+
     public String login(LoginParams loginParams) throws RuntimeException{
         String email = loginParams.getEmail();
         String password = loginParams.getPassword();
