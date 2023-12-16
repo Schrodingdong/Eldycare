@@ -14,14 +14,6 @@ amqp:
     exchange: notification-exchange
     routingkey: 'notification.#.*'
 
-#notification:
-#  rabbitmq:
-#    notificationQueue: notificationQueue
-#    relativeQueue: relativeQueue
-#    exchange: amq.topic
-#    notificationRoutingkey: 'notificationkey.#.*'
-#    relativeRoutingKey: 'relativeKey.#.*'
-
 eureka:
   client:
     serviceUrl:
