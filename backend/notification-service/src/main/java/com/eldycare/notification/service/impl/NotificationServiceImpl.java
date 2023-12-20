@@ -1,5 +1,6 @@
 package com.eldycare.notification.service.impl;
 
+import com.eldycare.notification.config.WebSocketNotificationSender;
 import com.eldycare.notification.domain.Notification;
 import com.eldycare.notification.dto.NotificationDto;
 import com.eldycare.notification.mapper.NotificationMapper;
@@ -27,6 +28,9 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Autowired
     private AmqpTemplate amqpTemplate;
+
+    @Autowired
+    private WebSocketNotificationSender webSocketNotificationSender;
 
     @Autowired
     private NotificationMapper notificationMapper;
@@ -91,8 +95,12 @@ public class NotificationServiceImpl implements NotificationService {
     private void sendNotificationToRelative(Notification notification) {
         // Save the notification to MongoDB
         notificationRepository.save(notification);
-        // amqpTemplate.convertAndSend(notificationQueue, notification);
-        // ..
+        // Send a WebSocket message to the relative
+        webSocketNotificationSender.sendNotification(
+                notification.getRelativeEmail(),
+                notification.getAlertMessage()
+        );
+        // Log the information
         logger.info("sendNotificationToRelative: {}", notification);
     }
 

@@ -1,4 +1,4 @@
-package com.eldycare.notification.amqp;
+package com.eldycare.notification.config;
 
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
