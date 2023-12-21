@@ -13,4 +13,8 @@ public interface UserRepository extends Neo4jRepository<UserModel, String> {
 
     @Query("MATCH (u:User {email: $userEmail})-[r:HAS_URGENT_CONTACT]->(uc:User {email: $urgentContactEmail}) DELETE r")
     void deleteUrgentContact(String userEmail, String urgentContactEmail);
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> main

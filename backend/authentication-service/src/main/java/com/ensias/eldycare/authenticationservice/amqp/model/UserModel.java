@@ -18,4 +18,8 @@ public class UserModel implements Serializable {
         this.username = authModel.getUsername();
         this.userType = authModel.getUserType().toString();
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> main

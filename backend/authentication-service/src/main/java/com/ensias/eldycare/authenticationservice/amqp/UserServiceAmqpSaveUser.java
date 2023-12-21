@@ -28,4 +28,8 @@ public class UserServiceAmqpSaveUser {
         objectNode.put("userType", user.getUserType());
         rabbitTemplate.convertAndSend(userExchange.getName(),userExchange.getName(), objectNode.toString());
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> main

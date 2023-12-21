@@ -5,4 +5,10 @@ spring:
     password: ensias
     driverClassName: org.h2.Driver
   jpa:
+<<<<<<< HEAD
     database-platform: org.hibernate.dialect.H2Dialect
+=======
+    database-platform: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl-auto: update # or create-drop if you want to recreate the database on every startup
+>>>>>>> main

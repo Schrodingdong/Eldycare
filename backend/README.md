@@ -5,7 +5,11 @@
 Backend component of the Eldycare project. We will be following a **Microservice Event Driven Architecture**
 
 ## Getting Started
+<<<<<<< HEAD
 - NEO4J Connection 
+=======
+- NEO4J Connection
+>>>>>>> main
   - Add these variables to your environment
     - `NEO4J_URI=bolt://localhost:7687`
     - `NEO4J_USERNAME=neo4j`
@@ -19,7 +23,11 @@ Backend component of the Eldycare project. We will be following a **Microservice
 - [x] Authentication Service
   - [x] Connect with the User service
 - [x] User Service
+<<<<<<< HEAD
 - [ ] Notification Service
+=======
+- [x] Notification Service
+>>>>>>> main
 - [ ] Reminder Service
 
 

@@ -21,4 +21,8 @@ amqp:
     exchange: auth-exchange
   user:
     queue: user-queue
+<<<<<<< HEAD
     exchange: user-exchange
+=======
+    exchange: user-exchange
+>>>>>>> main

@@ -35,4 +35,8 @@ public class UserServiceConfig {
                 .with(exchangeName);
     }
 
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> main

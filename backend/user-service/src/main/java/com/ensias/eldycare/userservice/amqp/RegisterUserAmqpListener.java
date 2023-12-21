@@ -7,12 +7,30 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+<<<<<<< HEAD
+=======
+import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageProperties;
+>>>>>>> main
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+<<<<<<< HEAD
 @Component
 public class RegisterUserAmqpListener {
+=======
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+@Component
+public class RegisterUserAmqpListener {
+
+    @Autowired
+    private AmqpTemplate amqpTemplate;
+>>>>>>> main
     @Autowired
     private UserService userService;
     @Autowired
@@ -25,4 +43,45 @@ public class RegisterUserAmqpListener {
         LOG.info("Received user from Auth-Service : " + user);
         userService.addUser(user);
     }
+<<<<<<< HEAD
 }
+=======
+
+    @RabbitListener(queues = "${amqp.notif.queue}")
+    public void registerNotification(Message message){
+        String elderEmailWithQuotes = new String(message.getBody());
+        String elderEmail = elderEmailWithQuotes.substring(1, elderEmailWithQuotes.length() - 1);
+        // Process the elderEmail and retrieve the list of close relatives
+        List<String> closeRelativeEmails = getCloseRelativeEmails(elderEmail);
+
+        // Create a response message and set the correlation ID
+        MessageProperties messageProperties = new MessageProperties();
+        messageProperties.setCorrelationId(message.getMessageProperties().getCorrelationId());
+        Message responseMessage = new Message(convertListToJson(closeRelativeEmails).getBytes(), messageProperties);
+
+        // Send the response back to the notification service
+        amqpTemplate.send(message.getMessageProperties().getReplyTo(), responseMessage);
+    }
+
+    private List<String> getCloseRelativeEmails(String elderEmail) {
+        Set<UserModel> relatives = userService.getUrgentContacts(elderEmail);
+        List<String> relativeEmails = new ArrayList<>();
+
+        for (UserModel relative : relatives) {
+            relativeEmails.add(relative.getEmail());
+        }
+
+        return relativeEmails;
+    }
+
+    private String convertListToJson(List<String> list) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.writeValueAsString(list);
+        } catch (Exception e) {
+            // Handle exception (e.g., log it)
+            return "";
+        }
+    }
+}
+>>>>>>> main

@@ -37,4 +37,8 @@ public class UserModel {
                 ", userType=" + userType +
                 '}';
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> main

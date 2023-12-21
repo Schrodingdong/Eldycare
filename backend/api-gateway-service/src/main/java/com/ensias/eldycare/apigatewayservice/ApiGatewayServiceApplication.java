@@ -37,6 +37,13 @@ public class ApiGatewayServiceApplication {
                         .filters(f -> f
                                 .filter(filter))
                         .uri("lb://USER-SERVICE"))
+<<<<<<< HEAD
+=======
+                .route(r -> r.path("/notification/**")
+                        .filters(f -> f
+                                .filter(filter))
+                        .uri("lb://NOTIFICATION-SERVICE"))
+>>>>>>> main
                 .build();
     }
 

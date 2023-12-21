@@ -9,13 +9,27 @@ spring:
       password: ${NEO4J_PASSWORD}
   application:
     name: user-service
+<<<<<<< HEAD
 amqp:
   user:
     queue: user-queue
+=======
+
+amqp:
+  user:
+    queue: user-queue
+  notif:
+    queue: notification-queue
+
+>>>>>>> main
 eureka:
   client:
     serviceUrl:
       defaultZone: http://localhost:8761/eureka
     register-with-eureka: true
+<<<<<<< HEAD
     fetch-registry: true
 
+=======
+    fetch-registry: true
+>>>>>>> main

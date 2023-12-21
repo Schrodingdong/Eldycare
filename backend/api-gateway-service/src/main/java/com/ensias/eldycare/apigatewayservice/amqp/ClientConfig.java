@@ -31,4 +31,8 @@ public class ClientConfig {
         converter.setAllowedListPatterns(List.of("java.util.*", "java.lang.*"));
         return converter;
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> main

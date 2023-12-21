@@ -35,4 +35,8 @@ public class RpcServerConfig {
                 .to(directExchange)
                 .with("rpc");
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> main

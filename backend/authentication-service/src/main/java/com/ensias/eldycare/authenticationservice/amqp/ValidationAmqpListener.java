@@ -21,4 +21,8 @@ public class ValidationAmqpListener {
         LOG.info("JWT validation result: " + validation);
         return validation;
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> main

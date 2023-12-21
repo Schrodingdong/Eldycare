@@ -100,4 +100,8 @@ public class AuthController {
         }
         return ResponseEntity.ok().body(rootNode);
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> main
