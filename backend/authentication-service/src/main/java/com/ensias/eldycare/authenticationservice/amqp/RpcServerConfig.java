@@ -9,7 +9,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 /**
- * This class is used to configure the RabbitMQ server for RPC pattern for JWT validation
+ * This class is used to configure the RabbitMQ server for RPC pattern for JWT
+ * validation
  */
 @Component
 public class RpcServerConfig {
@@ -19,17 +20,17 @@ public class RpcServerConfig {
     private String exchangeName;
 
     @Bean
-    public DirectExchange directExchange(){
+    public DirectExchange directExchange() {
         return new DirectExchange(exchangeName);
     }
 
     @Bean
-    public Queue queue(){
+    public Queue queue() {
         return new Queue(queueName);
     }
 
     @Bean
-    public Binding binding(Queue queue, DirectExchange directExchange){
+    public Binding binding(Queue queue, DirectExchange directExchange) {
         return BindingBuilder
                 .bind(queue)
                 .to(directExchange)

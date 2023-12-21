@@ -1,6 +1,5 @@
 package com.ensias.eldycare.authenticationservice.controller;
 
-
 import com.ensias.eldycare.authenticationservice.model.AuthModel;
 import com.ensias.eldycare.authenticationservice.model.controller_params.LoginParams;
 import com.ensias.eldycare.authenticationservice.model.controller_params.RegisterParams;
@@ -17,7 +16,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-
 @RestController
 @RequestMapping("/auth")
 @AllArgsConstructor
@@ -27,21 +25,21 @@ public class AuthController {
     private final ObjectMapper objectMapper;
 
     @GetMapping
-    public ResponseEntity<?> hello(){
+    public ResponseEntity<?> hello() {
         return ResponseEntity.ok("hello !!");
     }
 
     @PostMapping("/register")
-    public  ResponseEntity<?> register(@Validated  @RequestBody RegisterParams registerParams){
+    public ResponseEntity<?> register(@Validated @RequestBody RegisterParams registerParams) {
         AuthModel authModel = new AuthModel();
         authModel.setEmail(registerParams.getEmail());
         authModel.setPassword(registerParams.getPassword());
         authModel.setUsername(registerParams.getUsername());
         authModel.setUserType(registerParams.getUserType());
         LOG.info("Authentication model : " + authModel);
-        try{
+        try {
             authModel = authService.register(authModel);
-        } catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
         ObjectNode rootNode = objectMapper.createObjectNode();
@@ -59,7 +57,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public  ResponseEntity<?> login(@Validated @RequestBody LoginParams loginParams){
+    public ResponseEntity<?> login(@Validated @RequestBody LoginParams loginParams) {
         String JWT = authService.login(loginParams);
 
         ObjectNode rootNode = objectMapper.createObjectNode();
@@ -71,23 +69,24 @@ public class AuthController {
     }
 
     @GetMapping("/validate-jwt")
-    public  ResponseEntity<?> validateJWT(@RequestHeader(HttpHeaders.AUTHORIZATION) String JwtHeader){
+    public ResponseEntity<?> validateJWT(@RequestHeader(HttpHeaders.AUTHORIZATION) String JwtHeader) {
         String JWT = JwtUtils.extractJwt(JwtHeader);
         boolean isValid = authService.validateJWT(JWT);
 
         ObjectNode rootNode = objectMapper.createObjectNode();
         rootNode.put("isValid", isValid);
 
-        if (!isValid) return ResponseEntity.internalServerError().body(rootNode);
+        if (!isValid)
+            return ResponseEntity.internalServerError().body(rootNode);
         return ResponseEntity.ok(rootNode);
     }
 
     @GetMapping("/logout")
-    public  ResponseEntity<?> logout(@RequestHeader(HttpHeaders.AUTHORIZATION) String jwt){
+    public ResponseEntity<?> logout(@RequestHeader(HttpHeaders.AUTHORIZATION) String jwt) {
         ObjectNode rootNode = objectMapper.createObjectNode();
         try {
             String tokenPrefix = "Bearer ";
-            if (!jwt.startsWith(tokenPrefix)){
+            if (!jwt.startsWith(tokenPrefix)) {
                 LOG.warn("Invalid token syntax: " + jwt);
                 throw new RuntimeException("Invalid token");
             }

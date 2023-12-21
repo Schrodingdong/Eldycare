@@ -21,42 +21,41 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public void addUrgentContact(String userEmail, String urgentContactEmail) throws RuntimeException{
-        try{
+    public void addUrgentContact(String userEmail, String urgentContactEmail) throws RuntimeException {
+        try {
             userRepository.addUrgentContact(userEmail, urgentContactEmail);
-        } catch (Exception e){
+        } catch (Exception e) {
             throw new RuntimeException("Error while adding urgent contact : \n" + e.getMessage());
         }
     }
 
-    public List<UserModel> getAllUsers(){
+    public List<UserModel> getAllUsers() {
         return userRepository.findAll();
     }
 
-    public UserModel getUser(String email){
+    public UserModel getUser(String email) {
         return userRepository.findById(email).orElseThrow();
     }
 
-    public Set<UserModel> getUrgentContacts(String email){
+    public Set<UserModel> getUrgentContacts(String email) {
         UserModel user = userRepository.findById(email).orElseThrow();
         return user.getUrgentContacts();
     }
 
-    public void deleteUser(String email){
+    public void deleteUser(String email) {
         userRepository.deleteById(email);
     }
-    public void deleteUrgentContact(String userEmail, String urgentContactEmail){
+
+    public void deleteUrgentContact(String userEmail, String urgentContactEmail) {
         userRepository.deleteUrgentContact(userEmail, urgentContactEmail);
     }
 
-    public UserModel updateUser(String email, UserModel userInfo){
+    public UserModel updateUser(String email, UserModel userInfo) {
         UserModel user = userRepository.findById(email).orElseThrow();
         user.setUsername(
-                userInfo.getUsername() == null ? user.getUsername() : userInfo.getUsername()
-        );
+                userInfo.getUsername() == null ? user.getUsername() : userInfo.getUsername());
         user.setUserType(
-                userInfo.getUserType() == null ? user.getUserType() : userInfo.getUserType()
-        );
+                userInfo.getUserType() == null ? user.getUserType() : userInfo.getUserType());
         return userRepository.save(user);
     }
 }

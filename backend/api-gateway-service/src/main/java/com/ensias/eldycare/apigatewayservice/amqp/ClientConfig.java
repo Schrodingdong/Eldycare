@@ -9,7 +9,8 @@ import org.springframework.context.annotation.Configuration;
 import java.util.List;
 
 /**
- * This class is used to configure the RabbitMQ client for RPC pattern for JWT validation
+ * This class is used to configure the RabbitMQ client for RPC pattern for JWT
+ * validation
  */
 @Configuration
 public class ClientConfig {
@@ -17,10 +18,9 @@ public class ClientConfig {
     private String exchangeName;
 
     @Bean
-    public DirectExchange directExchange(){
+    public DirectExchange directExchange() {
         return new DirectExchange(exchangeName);
     }
-
 
     /**
      * To ensure deserialization of Boolean class

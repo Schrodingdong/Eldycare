@@ -19,9 +19,9 @@ public class AuthService {
     private final JwtUtils jwtUtils;
     private final Logger LOG = LoggerFactory.getLogger(AuthService.class);
 
-    public AuthModel register(AuthModel authModel) throws RuntimeException{
+    public AuthModel register(AuthModel authModel) throws RuntimeException {
         // check Mails
-        if (authRepository.existsByEmail(authModel.getEmail())){
+        if (authRepository.existsByEmail(authModel.getEmail())) {
             throw new RuntimeException("The email is already registered");
         }
         // save user to User-Service
@@ -30,14 +30,14 @@ public class AuthService {
         return authRepository.save(authModel);
     }
 
-    public String login(LoginParams loginParams) throws RuntimeException{
+    public String login(LoginParams loginParams) throws RuntimeException {
         String email = loginParams.getEmail();
         String password = loginParams.getPassword();
         AuthModel authModel = authRepository.findByEmail(email);
-        if(authModel == null){
+        if (authModel == null) {
             throw new RuntimeException("The email is not registered");
         } else {
-            if (authModel.getPassword().equals(password)){
+            if (authModel.getPassword().equals(password)) {
                 return generateJwt(email);
             } else {
                 throw new RuntimeException("The password is incorrect");
@@ -45,18 +45,19 @@ public class AuthService {
         }
     }
 
-    public void logout(String jwt){
+    public void logout(String jwt) {
         jwtUtils.blackListToken(jwt);
     }
 
-    public String generateJwt(String userEmail){
+    public String generateJwt(String userEmail) {
         return jwtUtils.generateToken(userEmail);
     }
-    public boolean validateJWT(String jwt){
-        try{
+
+    public boolean validateJWT(String jwt) {
+        try {
             jwtUtils.validateToken(jwt);
             return true;
-        } catch (RuntimeException e){
+        } catch (RuntimeException e) {
             LOG.error(e.getMessage());
             return false;
         }
@@ -64,7 +65,7 @@ public class AuthService {
 
     public Object getUserType(String email) {
         AuthModel authModel = authRepository.findByEmail(email);
-        if (authModel != null){
+        if (authModel != null) {
             return authModel.getUserType();
         }
         return null;

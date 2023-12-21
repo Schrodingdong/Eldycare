@@ -37,7 +37,7 @@ public class RegisterUserAmqpListener {
     }
 
     @RabbitListener(queues = "${amqp.notif.queue}")
-    public void registerNotification(Message message){
+    public void registerNotification(Message message) {
         String elderEmailWithQuotes = new String(message.getBody());
         String elderEmail = elderEmailWithQuotes.substring(1, elderEmailWithQuotes.length() - 1);
         // Process the elderEmail and retrieve the list of close relatives

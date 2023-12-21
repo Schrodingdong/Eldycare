@@ -20,12 +20,12 @@ public class UserServiceAmqpSaveUser {
     @Autowired
     private ObjectMapper objectMapper;
 
-    public void saveUser(UserModel user){
+    public void saveUser(UserModel user) {
         LOG.info("Sending user to User-Service : " + user);
         ObjectNode objectNode = objectMapper.createObjectNode();
         objectNode.put("email", user.getEmail());
         objectNode.put("username", user.getUsername());
         objectNode.put("userType", user.getUserType());
-        rabbitTemplate.convertAndSend(userExchange.getName(),userExchange.getName(), objectNode.toString());
+        rabbitTemplate.convertAndSend(userExchange.getName(), userExchange.getName(), objectNode.toString());
     }
 }

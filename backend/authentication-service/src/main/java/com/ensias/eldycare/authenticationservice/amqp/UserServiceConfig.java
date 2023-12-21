@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 
-
 @Component
 public class UserServiceConfig {
     @Value("${amqp.user.queue}")
@@ -18,17 +17,17 @@ public class UserServiceConfig {
     private String exchangeName;
 
     @Bean("userQueue")
-    public Queue userQueue(){
+    public Queue userQueue() {
         return new Queue(queueName);
     }
 
     @Bean("userExchange")
-    public DirectExchange userExchange(){
+    public DirectExchange userExchange() {
         return new DirectExchange(exchangeName);
     }
 
     @Bean
-    public Binding userBinding(Queue userQueue, DirectExchange userExchange){
+    public Binding userBinding(Queue userQueue, DirectExchange userExchange) {
         return BindingBuilder
                 .bind(userQueue)
                 .to(userExchange)

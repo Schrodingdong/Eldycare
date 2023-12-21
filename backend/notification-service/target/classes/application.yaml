@@ -4,7 +4,7 @@ server:
 spring:
   data:
     mongodb:
-      uri: mongodb+srv://yassinouhadi:9ZdBVB78UH6Tb4O7@eldycare-cluster.xcn4yoa.mongodb.net/eldycare?retryWrites=true&w=majority
+      uri: mongodb+srv://${DB_NAME}:${DB_PWD}@${CLUSTER_URI}/${DB_NAME}?retryWrites=true&w=majority
   application:
     name: notification-service
 
@@ -13,14 +13,6 @@ amqp:
     queue: notification-queue
     exchange: notification-exchange
     routingkey: 'notification.#.*'
-
-#notification:
-#  rabbitmq:
-#    notificationQueue: notificationQueue
-#    relativeQueue: relativeQueue
-#    exchange: amq.topic
-#    notificationRoutingkey: 'notificationkey.#.*'
-#    relativeRoutingKey: 'relativeKey.#.*'
 
 eureka:
   client:

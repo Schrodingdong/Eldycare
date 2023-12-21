@@ -22,7 +22,8 @@ public class UserController {
     }
 
     @PutMapping("/add/urgent-contact/{urgentContactEmail}")
-    public ResponseEntity<?> addUrgentContact(@PathVariable String urgentContactEmail, @RequestHeader("User-Email") String userEmail) {
+    public ResponseEntity<?> addUrgentContact(@PathVariable String urgentContactEmail,
+            @RequestHeader("User-Email") String userEmail) {
         try {
             userService.addUrgentContact(userEmail, urgentContactEmail);
             return ResponseEntity.ok("Urgent contact added successfully");
@@ -32,11 +33,11 @@ public class UserController {
     }
 
     // TODO Recursion problem to solve
-//    @GetMapping("/get/all")
-//    public ResponseEntity<?> getAllUsers() {
-//        List<UserModel> users = userService.getAllUsers();
-//        return ResponseEntity.ok(users);
-//    }
+    // @GetMapping("/get/all")
+    // public ResponseEntity<?> getAllUsers() {
+    // List<UserModel> users = userService.getAllUsers();
+    // return ResponseEntity.ok(users);
+    // }
 
     @GetMapping("/get/{email}")
     public ResponseEntity<?> getUser(@PathVariable String email) {
@@ -45,24 +46,25 @@ public class UserController {
     }
 
     @GetMapping("/get/urgent-contacts")
-    public ResponseEntity<?> getUrgentContacts(@RequestHeader("User-Email") String userEmail){
+    public ResponseEntity<?> getUrgentContacts(@RequestHeader("User-Email") String userEmail) {
         return ResponseEntity.ok(userService.getUrgentContacts(userEmail));
     }
 
     @DeleteMapping("/delete/{email}")
-    public ResponseEntity<?> deleteUser(@PathVariable String email){
+    public ResponseEntity<?> deleteUser(@PathVariable String email) {
         userService.deleteUser(email);
         return ResponseEntity.ok("User deleted successfully");
     }
 
     @DeleteMapping("/delete/urgent-contact/{urgentContactEmail}")
-    public ResponseEntity<?> deleteUrgentContact(@PathVariable String urgentContactEmail, @RequestHeader("User-Email") String userEmail){
+    public ResponseEntity<?> deleteUrgentContact(@PathVariable String urgentContactEmail,
+            @RequestHeader("User-Email") String userEmail) {
         userService.deleteUrgentContact(userEmail, urgentContactEmail);
         return ResponseEntity.ok("Urgent contact deleted successfully");
     }
 
     @PatchMapping("/update/{email}")
-    public ResponseEntity<?> updateUser(@PathVariable String email, @RequestBody UserModel userInfo){
+    public ResponseEntity<?> updateUser(@PathVariable String email, @RequestBody UserModel userInfo) {
         UserModel user = userService.updateUser(email, userInfo);
         return ResponseEntity.ok(user);
     }
