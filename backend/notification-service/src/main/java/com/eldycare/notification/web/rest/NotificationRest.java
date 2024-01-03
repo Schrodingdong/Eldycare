@@ -1,5 +1,6 @@
 package com.eldycare.notification.web.rest;
 
+import com.eldycare.notification.config.WebSocketNotificationSender;
 import com.eldycare.notification.constants.ServiceConstants;
 import com.eldycare.notification.dto.NotificationDto;
 import com.eldycare.notification.service.service.NotificationService;
@@ -18,6 +19,8 @@ public class NotificationRest {
 
     @Autowired
     NotificationService notificationService;
+    @Autowired
+    WebSocketNotificationSender webSocketNotificationSender;
 
     @PostMapping("/send")
     public ResponseEntity<?> sendNotification(@RequestBody NotificationDto notification) {
@@ -28,5 +31,10 @@ public class NotificationRest {
             e.printStackTrace();
             return SystemUtils.getResponseEntity(ServiceConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @PostMapping("/test/send")
+    public void sendTestNotification(@RequestBody String string) {
+        webSocketNotificationSender.sendNotification("test", string);
     }
 }

@@ -12,9 +12,7 @@ public class NotificationDto {
     private String alertMessage;
     private List<AlertType> alertType;
     private String alertTime;
-
     private String location;
-
     private String relativeEmail;
 
     public  NotificationDto() { }

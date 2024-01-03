@@ -22,4 +22,13 @@ Backend component of the Eldycare project. We will be following a **Microservice
 - [x] Notification Service
 - [ ] Reminder Service
 
+## Use Case
+- Register a user 
+  - Check if all the resources are created in : 
+    - Neo4j
+    - postgresql
+- Login a user
+  - get the jwt
+- Use the user service to get the user information
+  - put the jwt in `Authorization` header
 

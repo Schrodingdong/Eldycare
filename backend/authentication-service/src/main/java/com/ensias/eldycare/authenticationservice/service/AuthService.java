@@ -24,9 +24,10 @@ public class AuthService {
         if (authRepository.existsByEmail(authModel.getEmail())) {
             throw new RuntimeException("The email is already registered");
         }
-        // save user to User-Service
+        // save user to User-Service DB
         UserModel userModel = new UserModel(authModel);
         userServiceAmqpSaveUser.saveUser(userModel);
+        // save user to Auth-Service DB
         return authRepository.save(authModel);
     }
 

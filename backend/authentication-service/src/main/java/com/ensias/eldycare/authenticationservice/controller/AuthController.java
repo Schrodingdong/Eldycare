@@ -58,13 +58,18 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Validated @RequestBody LoginParams loginParams) {
-        String JWT = authService.login(loginParams);
-
+        String JWT = "";
         ObjectNode rootNode = objectMapper.createObjectNode();
+        try{
+            JWT = authService.login(loginParams);
+        } catch (RuntimeException e) {
+            rootNode.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+
         rootNode.put("message", "Successfully logged in !");
         rootNode.put("jwt", JWT);
         rootNode.put("userType", authService.getUserType(loginParams.getEmail()).toString());
-
         return ResponseEntity.ok(rootNode);
     }
 

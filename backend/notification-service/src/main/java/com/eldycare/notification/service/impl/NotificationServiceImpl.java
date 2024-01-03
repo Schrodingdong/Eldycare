@@ -45,6 +45,7 @@ public class NotificationServiceImpl implements NotificationService {
 
         String elderEmail = notificationDto.getElderEmail();
         List<String> closeRelativeEmails = getCloseRelativeIds(elderEmail);
+        logger.info("closeRelativeEmails: {}", closeRelativeEmails);
 
         // Create a CountDownLatch to synchronize the main thread with the worker threads
         CountDownLatch latch = new CountDownLatch(closeRelativeEmails.size());
@@ -64,9 +65,10 @@ public class NotificationServiceImpl implements NotificationService {
         // Send notification for all close relatives using multithreading
         for (String closeRelativeId : closeRelativeEmails) {
             tasks.add(() -> {
-                // Modify this part to include the convertAndSend function
+                // TODO : Modify this part to include the convertAndSend function
                 notificationDto.setRelativeEmail(closeRelativeId);
                 Notification notification = notificationMapper.toNotification(notificationDto);
+                logger.info("sending this notification to relative : {}", notification);
                 sendNotificationToRelative(notification);
 
                 // Notify the CountDownLatch that a thread has finished
@@ -94,19 +96,23 @@ public class NotificationServiceImpl implements NotificationService {
     // Method to send notification to a specific relative
     private void sendNotificationToRelative(Notification notification) {
         // Save the notification to MongoDB
-        notificationRepository.save(notification);
+        logger.info("sendNotificatiionTORelative - notification: {}", notification);
+        // TODO : problem in saving
+//        Notification savedNotif = notificationRepository.save(notification);
+//        logger.info("savedNotif: {}", savedNotif);
+
         // Send a WebSocket message to the relative
         webSocketNotificationSender.sendNotification(
-                notification.getRelativeEmail(),
+                notification.getElderEmail(),
                 notification.getAlertMessage()
         );
-        // Log the information
-        logger.info("sendNotificationToRelative: {}", notification);
     }
 
     private List<String> getCloseRelativeIds(String elderEmail) {
         // Send request to user service
+        logger.info("getCloseRelativeIds: {}", elderEmail);
         Object response = amqpTemplate.convertSendAndReceive(notificationQueue, elderEmail);
+        logger.info("getCloseRelativeIds response: {}", response);
 
         // Process the response
         if (response instanceof List<?>) {

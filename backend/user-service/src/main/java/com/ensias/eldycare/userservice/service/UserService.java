@@ -44,6 +44,7 @@ public class UserService {
 
     public void deleteUser(String email) {
         userRepository.deleteById(email);
+        // TODO : delete user from Auth-Service
     }
 
     public void deleteUrgentContact(String userEmail, String urgentContactEmail) {
