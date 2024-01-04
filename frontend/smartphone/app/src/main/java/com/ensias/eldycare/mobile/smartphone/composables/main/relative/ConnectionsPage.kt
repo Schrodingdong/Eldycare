@@ -2,6 +2,7 @@ package com.ensias.eldycare.mobile.smartphone.composables.main.relative
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -39,43 +40,166 @@ import java.text.SimpleDateFormat
 import java.time.Instant
 import java.util.Date
 
+//@OptIn(ExperimentalMaterial3Api::class)
+//@Composable
+//fun ConnectionsPage(navController: NavController) {
+//    val connectionMockList = listOf(
+//        Connection("John Doe", "john@gmail.com", "1234567890", Alert(Date.from(Instant.now()), "Alert 1")),
+//        Connection("Jane Doe", "jane@gmail.com", "1234567890"),
+//        Connection("John Doe", "john@gmail.com", "1234567890"),
+//        Connection("Jane Doe", "jane@gmail.com", "1234567890"),
+//    )
+//    var showBottomSheet by remember { mutableStateOf(false) }
+//    var clickedConnection by remember { mutableStateOf(Connection("","", "")) }
+//    var sheetState = rememberModalBottomSheetState()
+//
+//    Scaffold{ innerPadding ->
+//        Column(
+//            modifier = Modifier
+//                .padding(innerPadding)
+//                .fillMaxWidth()
+//        ){
+//            TopDecorationSimple("My\nReminders")
+//            SectionTitle(text = "My\nConnections")
+//            ConnectionsList(connectionMockList, { showBottomSheet = true }, clickedConnection)
+//
+//            // bottom sheet logic
+//            if(showBottomSheet){
+//                ModalBottomSheet(
+//                    containerColor = MaterialTheme.colorScheme.surface,
+//                    onDismissRequest = { showBottomSheet = false },
+//                    sheetState = sheetState,
+//                ){
+//                    BottomSheetContent(clickedConnection)
+//                }
+//            }
+//        }
+//    }
+//}
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ConnectionsPage(navController: NavController) {
+fun ConnectionsSection(innerPadding: PaddingValues, connectionList: List<Connection>? = null){
+    var showBottomSheet by remember { mutableStateOf(false) }
+    var clickedConnection by remember { mutableStateOf(Connection("","", "")) }
+    var sheetState = rememberModalBottomSheetState()
     val connectionMockList = listOf(
         Connection("John Doe", "john@gmail.com", "1234567890", Alert(Date.from(Instant.now()), "Alert 1")),
         Connection("Jane Doe", "jane@gmail.com", "1234567890"),
         Connection("John Doe", "john@gmail.com", "1234567890"),
         Connection("Jane Doe", "jane@gmail.com", "1234567890"),
     )
-    var showBottomSheet by remember { mutableStateOf(false) }
-    var clickedConnection by remember { mutableStateOf(Connection("","", "")) }
-    var sheetState = rememberModalBottomSheetState()
+    Column(
+        modifier = Modifier
+            .padding(innerPadding)
+            .fillMaxWidth()
+    ){
+        TopDecorationSimple("My\nReminders")
+        SectionTitle(text = "My\nConnections")
+        ConnectionsList(
+            connectionList = if(connectionList.isNullOrEmpty()) connectionMockList else connectionList,
+            onConnectionClick = { showBottomSheet = true },
+            clickedConnection = clickedConnection
+        )
 
-    Scaffold{ innerPadding ->
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxWidth()
-        ){
-            TopDecorationSimple("My\nReminders")
-            SectionTitle(text = "My\nConnections")
-            ConnectionsList(connectionMockList, { showBottomSheet = true }, clickedConnection)
-
-            // bottom sheet logic
-            if(showBottomSheet){
-                ModalBottomSheet(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    onDismissRequest = { showBottomSheet = false },
-                    sheetState = sheetState,
-                ){
-                    BottomSheetContent(clickedConnection)
-                }
+        // bottom sheet logic
+        if(showBottomSheet){
+            ModalBottomSheet(
+                containerColor = MaterialTheme.colorScheme.surface,
+                onDismissRequest = { showBottomSheet = false },
+                sheetState = sheetState,
+            ){
+                BottomSheetContent(clickedConnection)
             }
+        }
+    }
+
+}
+
+@Composable
+fun SectionTitle(text: String){
+    Column (
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(32.dp)
+    ){
+        text.split('\n').forEach { t ->
+            Text(
+                text = t,
+                fontWeight = FontWeight.Bold,
+                fontSize = MaterialTheme.typography.headlineLarge.fontSize
+            )
+        }
+    }
+
+}
+
+@Composable
+fun ConnectionsList(connectionList: List<Connection> = emptyList(), onConnectionClick: () -> Unit, clickedConnection: Connection) {
+    Column (
+        modifier = Modifier
+            .verticalScroll(rememberScrollState())
+            .fillMaxWidth()
+            .padding(start = 32.dp, end = 32.dp, bottom = 8.dp)
+    ){
+        connectionList.forEach { connection ->
+            ConnectionItem(connection, onConnectionClick, clickedConnection)
         }
     }
 }
 
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ConnectionItem(connection: Connection, onConnectionClick: () -> Unit, clickedConnection: Connection) {
+    OutlinedCard (
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        onClick = {
+            /*TODO : make a bottom sheet appear with the needed info on screen */
+            clickedConnection.name = connection.name
+            clickedConnection.phone = connection.phone
+            clickedConnection.email = connection.email
+            clickedConnection.lastAlert = connection.lastAlert
+            onConnectionClick()
+        }
+    ){
+        Row(
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ){
+            Row (
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ){
+                Icon(Icons.Filled.Person, contentDescription = "Connection Icon", modifier = Modifier.padding(end = 8.dp) )
+                Column (
+                    modifier = Modifier
+                        .padding(16.dp)
+                ) {
+                    Text(text = connection.name, fontWeight = FontWeight.Bold)
+                    Text(text = connection.phone, fontWeight = FontWeight.Light, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+
+            }
+//            Button(
+////                modifier = Modifier.width(25.dp),
+//                onClick = { /*TODO*/ }
+//            ) {
+//                Icon(Icons.Filled.KeyboardArrowRight, contentDescription = "Connection Icon", tint = MaterialTheme.colorScheme.onPrimary)
+//            }
+        }
+    }
+}
+
+
+// ========================================================================================
+// Bottom Sheet components
+// ========================================================================================
 @Composable
 fun BottomSheetContent(connection: Connection){
     Column(
@@ -194,95 +318,6 @@ fun BottomSheetConnectionInfo(connection: Connection){
         Row {
             Text(text = "Email: ", fontWeight = FontWeight.Bold)
             Text(text = connection.email, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        }
-    }
-}
-
-
-
-
-
-
-
-
-
-@Composable
-fun SectionTitle(text: String){
-    Column (
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(32.dp)
-    ){
-        text.split('\n').forEach { t ->
-            Text(
-                text = t,
-                fontWeight = FontWeight.Bold,
-                fontSize = MaterialTheme.typography.headlineLarge.fontSize
-            )
-        }
-    }
-
-}
-
-@Composable
-fun ConnectionsList(connections: List<Connection> = emptyList(), onConnectionClick: () -> Unit, clickedConnection: Connection) {
-    Column (
-        modifier = Modifier
-            .verticalScroll(rememberScrollState())
-            .fillMaxWidth()
-            .padding(start = 32.dp, end = 32.dp, bottom = 8.dp)
-    ){
-        connections.forEach { connection ->
-            ConnectionItem(connection, onConnectionClick, clickedConnection)
-        }
-    }
-}
-
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ConnectionItem(connection: Connection, onConnectionClick: () -> Unit, clickedConnection: Connection) {
-    OutlinedCard (
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        onClick = {
-            /*TODO : make a bottom sheet appear with the needed info on screen */
-            clickedConnection.name = connection.name
-            clickedConnection.phone = connection.phone
-            clickedConnection.email = connection.email
-            clickedConnection.lastAlert = connection.lastAlert
-            onConnectionClick()
-        }
-    ){
-        Row(
-            modifier = Modifier
-                .padding(horizontal = 16.dp)
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-        ){
-            Row (
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ){
-                Icon(Icons.Filled.Person, contentDescription = "Connection Icon", modifier = Modifier.padding(end = 8.dp) )
-                Column (
-                    modifier = Modifier
-                        .padding(16.dp)
-                ) {
-                    Text(text = connection.name, fontWeight = FontWeight.Bold)
-                    Text(text = connection.phone, fontWeight = FontWeight.Light, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-
-            }
-//            Button(
-////                modifier = Modifier.width(25.dp),
-//                onClick = { /*TODO*/ }
-//            ) {
-//                Icon(Icons.Filled.KeyboardArrowRight, contentDescription = "Connection Icon", tint = MaterialTheme.colorScheme.onPrimary)
-//            }
         }
     }
 }

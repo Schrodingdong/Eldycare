@@ -1,6 +1,7 @@
 package com.ensias.eldycare.mobile.smartphone.composables.main.elderly
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -35,13 +36,9 @@ import java.text.SimpleDateFormat
 import java.time.Instant
 import java.util.Date
 
-@Composable
-fun AlertsPage(navController: NavController) {
-    val items = listOf(
-        Screen.RemindersPage,
-        Screen.AlertsPage
-    )
 
+@Composable
+fun AlertSectionComposable(innerPadding: PaddingValues, alertsList: List<Alert>? = null){
     val alertsMockList= listOf(
         Alert(Date.from(Instant.now()), "Alert 1"),
         Alert(Date.from(Instant.now()), "Alert 2"),
@@ -54,46 +51,18 @@ fun AlertsPage(navController: NavController) {
         Alert(Date.from(Instant.now()), "Alert 9"),
         Alert(Date.from(Instant.now()), "Alert 10"),
     )
-
-    Scaffold(
-        bottomBar = {
-            BottomNavigation(
-                elevation = 16.dp,
-                backgroundColor = Color.White
-            ){
-                val navBackStackEntry by navController.currentBackStackEntryAsState()
-                val currentDestination = navBackStackEntry?.destination
-                items.forEach { screen ->
-                    BottomNavigationItem(
-                        icon = { Icon(Icons.Filled.Home, contentDescription = null) },
-                        label = { Text(stringResource(screen.resourceId)) },
-                        selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
-                        unselectedContentColor = Color.Gray,
-                        selectedContentColor = Color.Black,
-                        onClick = {
-                            navController.navigate(screen.route) {
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
-                                }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        }
-                    )
-                }
-            }
-        }
-    ){ innerPadding ->
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxWidth()
-        ){
-            TopDecorationSimple("My\nReminders")
-            SectionTitle(text = "My\nAlerts")
-            AlertsList(alertsMockList)
-        }
+    Column(
+        modifier = Modifier
+            .padding(innerPadding)
+            .fillMaxWidth()
+    ){
+        TopDecorationSimple("My\nReminders")
+        SectionTitle(text = "My\nAlerts")
+        AlertsList(
+            if(alertsList.isNullOrEmpty()) alertsMockList else alertsList
+        )
     }
+
 }
 
 @Composable

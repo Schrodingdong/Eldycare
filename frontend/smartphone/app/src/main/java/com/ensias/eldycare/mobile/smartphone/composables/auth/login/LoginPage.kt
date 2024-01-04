@@ -36,12 +36,18 @@ import androidx.navigation.NavController
 import com.ensias.eldycare.mobile.smartphone.R
 import com.ensias.eldycare.mobile.smartphone.UserType
 import com.ensias.eldycare.mobile.smartphone.api.ApiClient
+import com.ensias.eldycare.mobile.smartphone.api.NotificationWebsocketClient
 import com.ensias.eldycare.mobile.smartphone.composables.Screen
 import com.ensias.eldycare.mobile.smartphone.composables.auth.signup.TopDecorWithText
 import com.ensias.eldycare.mobile.smartphone.data.LoginData
 import com.ensias.eldycare.mobile.smartphone.data.model.AuthLoginModel
+import com.ensias.eldycare.mobile.smartphone.service.AlertService
 import com.ensias.eldycare.mobile.smartphone.service.AuthService
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 /**
  * LOGIN PAGE
@@ -151,26 +157,29 @@ fun AuthDialog(message: String, navController: NavController, loginData: LoginDa
             )
         ).let {
             delay(2000L)
-            if(it.isSuccessful){
-                ApiClient.jwt = it.body()?.jwt?: ""
-                ApiClient.userType = it.body()?.userType?: UserType.ELDERLY
-
-                if (ApiClient.jwt == ""){
-                    Log.d("LOGIN", "Success: ${it.body()?.jwt}")
-                    dialogState = DialogState.ERROR
-                } else {
-                    onShowDialogChange(false)
-                    // navigate to Main page based on user type
-                    if (it.body()?.userType == UserType.RELATIVE)
-                        navController.navigate(Screen.ConnectionsPage.route)
-                    else if (it.body()?.userType == UserType.ELDERLY)
-                        navController.navigate(Screen.RemindersPage.route)
-
-                }
-            }
-            else {
+            if(!it.isSuccessful){
                 dialogState = DialogState.ERROR
                 Log.d("LOGIN", "Error: ${it.code()}")
+            }
+
+            ApiClient.userType = it.body()?.userType?: UserType.ELDERLY
+            ApiClient.email = loginData.email
+            ApiClient.jwt = it.body()?.jwt?: ""
+            if (ApiClient.jwt == ""){
+                dialogState = DialogState.ERROR
+                Log.d("LOGIN", "FAIL !!")
+            } else {
+                onShowDialogChange(false)
+
+                // navigate to Main page based on user type
+                if (it.body()?.userType == UserType.RELATIVE){
+                    Log.d("LOGIN", "Success: ${it.body()?.jwt}, ${it.body()?.userType}")
+                    navController.navigate(Screen.RelativeHomePage.route)
+                }
+                else if (it.body()?.userType == UserType.ELDERLY){
+                    Log.d("LOGIN", "Success: ${it.body()?.jwt}, ${it.body()?.userType}")
+                    navController.navigate(Screen.ElderHomePage.route)
+                }
             }
         }
     }

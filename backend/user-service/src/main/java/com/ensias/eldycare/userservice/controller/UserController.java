@@ -49,6 +49,10 @@ public class UserController {
     public ResponseEntity<?> getUrgentContacts(@RequestHeader("User-Email") String userEmail) {
         return ResponseEntity.ok(userService.getUrgentContacts(userEmail));
     }
+    @GetMapping("/get/elder-contacts")
+    public ResponseEntity<?> getElderContacts(@RequestHeader("User-Email") String userEmail) {
+        return ResponseEntity.ok(userService.getElderContacts(userEmail));
+    }
 
     @DeleteMapping("/delete/{email}")
     public ResponseEntity<?> deleteUser(@PathVariable String email) {

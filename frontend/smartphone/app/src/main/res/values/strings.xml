@@ -6,6 +6,8 @@
     <string name="authentication">Authentication</string>
 
     <string name="home_page">homePage</string>
+    <string name="elder_home">elderHome</string>
+    <string name="relative_home">relativeHome</string>
     <string name="reminders">reminders</string>
     <string name="alerts">alerts</string>
     <string name="connections" >connections</string>

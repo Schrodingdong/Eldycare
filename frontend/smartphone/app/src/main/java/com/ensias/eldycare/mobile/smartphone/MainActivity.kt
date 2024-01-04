@@ -16,9 +16,9 @@ import androidx.navigation.compose.rememberNavController
 import com.ensias.eldycare.mobile.smartphone.composables.Screen
 import com.ensias.eldycare.mobile.smartphone.composables.auth.login.LoginPage
 import com.ensias.eldycare.mobile.smartphone.composables.auth.signup.SignupPage
-import com.ensias.eldycare.mobile.smartphone.composables.main.elderly.AlertsPage
-import com.ensias.eldycare.mobile.smartphone.composables.main.elderly.RemindersPage
-import com.ensias.eldycare.mobile.smartphone.composables.main.relative.ConnectionsPage
+import com.ensias.eldycare.mobile.smartphone.composables.main.elderly.ElderHomePage
+import com.ensias.eldycare.mobile.smartphone.composables.main.relative.RelativeHomePage
+import com.ensias.eldycare.mobile.smartphone.service.AlertService
 import com.ensias.eldycare.mobile.smartphone.theme.ComposeTestTheme
 
 class MainActivity : ComponentActivity() {
@@ -41,22 +41,19 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                     navigation(
-                        startDestination = Screen.RemindersPage.route,
+                        startDestination = Screen.ElderHomePage.route,
                         route = "main-elderly"
                     ){
-                        composable(Screen.RemindersPage.route) {
-                            RemindersPage(navController)
-                        }
-                        composable(Screen.AlertsPage.route) {
-                            AlertsPage(navController)
+                        composable(Screen.ElderHomePage.route) {
+                            ElderHomePage(navController)
                         }
                     }
                     navigation(
-                        startDestination = Screen.ConnectionsPage.route,
+                        startDestination = Screen.RelativeHomePage.route,
                         route = "main-relative"
                     ){
-                        composable(Screen.ConnectionsPage.route) {
-                            ConnectionsPage(navController)
+                        composable(Screen.RelativeHomePage.route) {
+                            RelativeHomePage(navController)
                         }
                     }
                 }

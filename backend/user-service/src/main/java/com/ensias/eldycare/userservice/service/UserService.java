@@ -41,6 +41,9 @@ public class UserService {
         UserModel user = userRepository.findById(email).orElseThrow();
         return user.getUrgentContacts();
     }
+    public Set<UserModel> getElderContacts(String email) {
+        return userRepository.getElderContacts(email);
+    }
 
     public void deleteUser(String email) {
         userRepository.deleteById(email);

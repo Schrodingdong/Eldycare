@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -41,12 +42,7 @@ import java.time.Instant
 import java.util.Date
 
 @Composable
-fun RemindersPage(navController: NavController) {
-    val items = listOf(
-        Screen.RemindersPage,
-        Screen.AlertsPage
-    )
-
+fun RemindersSectionComposable(innerPadding: PaddingValues, remindersList: List<Reminder>? = null){
     val remindersMockList= listOf(
         Reminder(Date.from(Instant.now()), "Reminder 1"),
         Reminder(Date.from(Instant.now()), "Reminder 2"),
@@ -60,53 +56,18 @@ fun RemindersPage(navController: NavController) {
         Reminder(Date.from(Instant.now()), "Reminder 10"),
         Reminder(Date.from(Instant.now()), "Reminder 11"),
     )
-    Scaffold(
-        floatingActionButton = {
-            FloatingActionButton(onClick = {
-                /*TODO*/
-                // Add the possibility to add a reminder using the Calendar API
-            }) {
-                Icon(Icons.Filled.Add, contentDescription = null, tint = Color.White)
-            }
-        },
-        bottomBar = {
-            BottomNavigation(
-                elevation = 8.dp,
-                backgroundColor = MaterialTheme.colorScheme.surface
-            ) {
-                val navBackStackEntry by navController.currentBackStackEntryAsState()
-                val currentDestination = navBackStackEntry?.destination
-                items.forEach { screen ->
-                    BottomNavigationItem(
-                        icon = { Icon(Icons.Filled.Home, contentDescription = null) },
-                        label = { androidx.compose.material3.Text(stringResource(screen.resourceId)) },
-                        selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
-                        unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        selectedContentColor = MaterialTheme.colorScheme.onSurface,
-                        onClick = {
-                            navController.navigate(screen.route) {
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
-                                }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        }
-                    )
-                }
-            }
-        }
-    ){ innerPadding ->
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxWidth()
-        ){
-            TopDecorationSimple("My\nReminders")
-            SectionTitle(text = "My\nReminders")
-            RemindersList(remindersMockList)
-        }
+    Column(
+        modifier = Modifier
+            .padding(innerPadding)
+            .fillMaxWidth()
+    ){
+        TopDecorationSimple("My\nReminders")
+        SectionTitle(text = "My\nReminders")
+        RemindersList(
+            if (remindersList.isNullOrEmpty()) remindersMockList else remindersList
+        )
     }
+
 }
 @Composable
 fun SectionTitle(text: String){
