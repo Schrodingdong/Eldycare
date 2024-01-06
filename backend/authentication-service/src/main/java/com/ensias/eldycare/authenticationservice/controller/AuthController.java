@@ -33,6 +33,7 @@ public class AuthController {
     public ResponseEntity<?> register(@Validated @RequestBody RegisterParams registerParams) {
         AuthModel authModel = new AuthModel();
         authModel.setEmail(registerParams.getEmail());
+        authModel.setPhone(registerParams.getPhone());
         authModel.setPassword(registerParams.getPassword());
         authModel.setUsername(registerParams.getUsername());
         authModel.setUserType(registerParams.getUserType());
@@ -49,6 +50,7 @@ public class AuthController {
         authModelNode.put("id", authModel.getId());
         authModelNode.put("username", authModel.getUsername());
         authModelNode.put("email", authModel.getEmail());
+        authModelNode.put("phone", authModel.getPhone());
         authModelNode.put("userType", authModel.getUserType().toString());
 
         rootNode.set("user", authModelNode);

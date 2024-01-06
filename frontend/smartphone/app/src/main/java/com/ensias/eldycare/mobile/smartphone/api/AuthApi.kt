@@ -1,5 +1,7 @@
 package com.ensias.eldycare.mobile.smartphone.api
 
+import com.ensias.eldycare.mobile.smartphone.data.api_model.ElderContactAddResponseModel
+import com.ensias.eldycare.mobile.smartphone.data.api_model.ElderContactsModel
 import com.ensias.eldycare.mobile.smartphone.data.model.NotificationModel
 import com.ensias.eldycare.mobile.smartphone.data.api_model.LoginResponseModel
 import com.ensias.eldycare.mobile.smartphone.data.api_model.NotificationResponse
@@ -9,8 +11,9 @@ import com.ensias.eldycare.mobile.smartphone.data.model.AuthRegisterModel
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
-import retrofit2.http.Header
 import retrofit2.http.POST
+import retrofit2.http.PUT
+import retrofit2.http.Path
 
 interface AuthApi {
     @POST("/auth/login")
@@ -20,5 +23,7 @@ interface AuthApi {
     @POST("/notification/send")
     suspend fun sendNotification(@Body notificationModel: NotificationModel) : Response<NotificationResponse>
     @GET("/users/get/elder-contacts")
-    suspend fun getElderContacts(@Header("User-Email") userEmail: String) : Response<List<String>>
+    suspend fun getElderContacts() : Response<List<ElderContactsModel>>
+    @PUT("/users/add/elder-contact/{email}")
+    suspend fun addElderContact(@Path("email") email: String) : Response<ElderContactAddResponseModel>
 }

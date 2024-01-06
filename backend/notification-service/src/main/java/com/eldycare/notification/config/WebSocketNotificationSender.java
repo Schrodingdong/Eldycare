@@ -14,16 +14,9 @@ public class WebSocketNotificationSender {
     private SimpMessagingTemplate messagingTemplate;
     private transient final Logger logger = LoggerFactory.getLogger(WebSocketNotificationSender.class);
 
-//    public void sendNotification(String relativeEmail, String message) {
-//        // Send the message to the relative's notification queue
-//        String destination = "/topic/notifications/" + relativeEmail;
-//        logger.info("\n>>> Sending to : destination: {}", destination);
-//        messagingTemplate.convertAndSend(destination, message);
-//    }
-    // change the architecture, we will have a queue for the elder, that the relative can connect to
     public void sendNotification(String elderEmail, String message) {
         // Send the message to the relative's notification queue
-        String destination = "/topic/notifications/" + elderEmail;
+        String destination = "/topic/alert/" + elderEmail;
         logger.info("\n>>> Sending to : destination: {}", destination);
         try{
             messagingTemplate.convertAndSend(destination, message);

@@ -10,10 +10,12 @@ import java.io.Serializable;
 public class UserModel implements Serializable {
     private String email;
     private String username;
+    private String phone;
     private String userType;
 
     public UserModel(AuthModel authModel) {
         this.email = authModel.getEmail();
+        this.phone = authModel.getPhone();
         this.username = authModel.getUsername();
         this.userType = authModel.getUserType().toString();
     }

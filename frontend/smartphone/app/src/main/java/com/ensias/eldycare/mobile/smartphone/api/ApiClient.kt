@@ -35,7 +35,9 @@ class ApiClient{
         var userType: UserType = UserType.RELATIVE
         var email: String = ""
         // TODO : change with the ip of your machine (localhost wont work)
-        val BASE_URL = "http://192.168.11.173:8888/"
+        val HOSTNAME = "10.0.2.2"
+        val PORT = "8082"
+        val BASE_URL = "http://10.0.2.2:8888/"
     }
     val authApi: AuthApi = RetrofitClient.retrofit.create(AuthApi::class.java)
 }

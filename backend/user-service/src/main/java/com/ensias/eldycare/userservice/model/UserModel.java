@@ -22,6 +22,8 @@ public class UserModel {
     private String email;
     @NotBlank
     private String username;
+    @NotBlank
+    private String phone;
     @NotNull
     private UserType userType;
 
@@ -34,6 +36,7 @@ public class UserModel {
         return "UserModel{" +
                 "email='" + email + '\'' +
                 ", username='" + username + '\'' +
+                ", phone='" + phone + '\'' +
                 ", userType=" + userType +
                 '}';
     }

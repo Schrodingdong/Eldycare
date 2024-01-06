@@ -7,34 +7,23 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.BottomNavigation
-import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.compose.currentBackStackEntryAsState
-import com.ensias.eldycare.mobile.smartphone.composables.Screen
 import com.ensias.eldycare.mobile.smartphone.data.Alert
 import java.text.SimpleDateFormat
 import java.time.Instant
 import java.util.Date
+import java.util.Locale
 
 
 @Composable
@@ -56,7 +45,6 @@ fun AlertSectionComposable(innerPadding: PaddingValues, alertsList: List<Alert>?
             .padding(innerPadding)
             .fillMaxWidth()
     ){
-        TopDecorationSimple("My\nReminders")
         SectionTitle(text = "My\nAlerts")
         AlertsList(
             if(alertsList.isNullOrEmpty()) alertsMockList else alertsList
@@ -83,8 +71,8 @@ fun AlertsList(alerts: List<Alert> = emptyList()) {
 
 @Composable
 fun AlertItem(alert: Alert) {
-    val dateText = SimpleDateFormat("dd/MM/yyyy").format(alert.time)
-    val timeText = "At " + SimpleDateFormat("HH:mm").format(alert.time)
+    val dateText = SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH).format(alert.time)
+    val timeText = "At " + SimpleDateFormat("HH:mm", Locale.FRENCH).format(alert.time)
     Card(
         modifier = Modifier
             .fillMaxWidth()

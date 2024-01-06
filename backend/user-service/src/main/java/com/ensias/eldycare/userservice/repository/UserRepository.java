@@ -13,9 +13,13 @@ public interface UserRepository extends Neo4jRepository<UserModel, String> {
     @Query("MATCH (u:User {email: $userEmail}) MATCH (uc:User {email: $urgentContactEmail}) CREATE (u)-[r:HAS_URGENT_CONTACT]->(uc) RETURN r")
     void addUrgentContact(String userEmail, String urgentContactEmail);
 
+    @Query("MATCH (u:User {email: $userEmail}) MATCH (uc:User {email: $elderContactEmail}) CREATE (uc)-[r:HAS_URGENT_CONTACT]->(u) RETURN r")
+    void addElderContact(String userEmail, String elderContactEmail);
+
     @Query("MATCH (u:User {email: $userEmail})-[r:HAS_URGENT_CONTACT]->(uc:User {email: $urgentContactEmail}) DELETE r")
     void deleteUrgentContact(String userEmail, String urgentContactEmail);
 
     @Query("MATCH (u:User)-[r:HAS_URGENT_CONTACT]->(uc:User {email: $userEmail}) RETURN u")
     Set<UserModel> getElderContacts(String userEmail);
+
 }

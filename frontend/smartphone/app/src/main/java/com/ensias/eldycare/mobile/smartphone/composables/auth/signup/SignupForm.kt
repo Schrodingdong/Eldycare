@@ -61,7 +61,7 @@ fun SignUpMainForm(signupData: SignupData, signupStep: Int, onSignupDataChange: 
 }
 @Composable
 fun TopDecorWithText(text: String){
-    var textElements = text.split('\n')
+    val textElements = text.split('\n')
     Box(
         // make the element vertically centered while layered
         contentAlignment = Alignment.CenterStart,
@@ -86,6 +86,7 @@ fun TopDecorWithText(text: String){
 fun SignupForm(signupData: SignupData, signupStep: Int, onSignupDataChange: (SignupData) -> Unit, onSignupStepChange: (Int) -> Unit){
     var confirmPasswordText by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf(false) }
+    var isPhoneValid by remember { mutableStateOf(false) }
     fun checkPassword(password: String, confirmPassword: String): Boolean{
         return password == confirmPassword
     }
@@ -96,7 +97,7 @@ fun SignupForm(signupData: SignupData, signupStep: Int, onSignupDataChange: (Sig
         Image(
             painter = painterResource(id = R.drawable.signup_illustration),
             contentDescription = "signup",
-            modifier= Modifier.width(300.dp)
+            modifier= Modifier.width(275.dp)
         )
         Column (modifier = Modifier.fillMaxWidth()){
             OutlinedTextField(
@@ -104,6 +105,15 @@ fun SignupForm(signupData: SignupData, signupStep: Int, onSignupDataChange: (Sig
                 value = signupData.name,
                 onValueChange = { onSignupDataChange(signupData.copy(name = it)) },
                 label = { Text("Name") }
+            )
+            OutlinedTextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = signupData.phone,
+                onValueChange = {
+                    onSignupDataChange(signupData.copy(phone= it))
+                    isPhoneValid = isPhoneNumber(it)
+                },
+                label = { Text("Phone Number") }
             )
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
@@ -129,7 +139,7 @@ fun SignupForm(signupData: SignupData, signupStep: Int, onSignupDataChange: (Sig
             )
         }
         Spacer(modifier = Modifier.padding(8.dp))
-        if (confirmPassword){
+        if (confirmPassword && isPhoneValid){
             Button(onClick = {
                 onSignupStepChange(signupStep + 1)
                 Log.d("signupData", "My signup data : \n\t>> "+ signupData.toString())
@@ -143,6 +153,13 @@ fun SignupForm(signupData: SignupData, signupStep: Int, onSignupDataChange: (Sig
             }
         }
     }
+}
+fun isPhoneNumber(input: String): Boolean {
+    // Define a regular expression for a simple phone number pattern
+    val phoneNumberRegex = Regex("^\\+?[0-9.-]+\$")
+
+    // Check if the input string matches the phone number pattern
+    return phoneNumberRegex.matches(input)
 }
 @Composable
 fun LoginAlternative(navController: NavController) {

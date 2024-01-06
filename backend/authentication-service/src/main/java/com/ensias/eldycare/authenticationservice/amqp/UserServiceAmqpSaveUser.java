@@ -24,6 +24,7 @@ public class UserServiceAmqpSaveUser {
         LOG.info("Sending user to User-Service : " + user);
         ObjectNode objectNode = objectMapper.createObjectNode();
         objectNode.put("email", user.getEmail());
+        objectNode.put("phone", user.getPhone());
         objectNode.put("username", user.getUsername());
         objectNode.put("userType", user.getUserType());
         rabbitTemplate.convertAndSend(userExchange.getName(), userExchange.getName(), objectNode.toString());

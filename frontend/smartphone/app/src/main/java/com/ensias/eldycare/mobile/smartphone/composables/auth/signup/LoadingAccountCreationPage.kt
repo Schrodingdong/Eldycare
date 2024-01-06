@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -16,8 +17,13 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.ensias.eldycare.mobile.smartphone.composables.Screen
@@ -33,6 +39,7 @@ import kotlinx.coroutines.withContext
  */
 @Composable
 fun LoadingAccountCreationPage(signupData: SignupData, navController: NavController){
+    var showErrorCreatingAccountDialog by remember { mutableStateOf(false) }
     Log.d("LoadingAccountCreationPage", "Data to send : \n\t>> " + signupData.toString())
 
     LaunchedEffect(Unit){
@@ -40,6 +47,7 @@ fun LoadingAccountCreationPage(signupData: SignupData, navController: NavControl
             AuthRegisterModel(
                 username = signupData.name,
                 email = signupData.email,
+                phone = signupData.phone,
                 password = signupData.password,
                 userType = signupData.userType
             )
@@ -53,7 +61,8 @@ fun LoadingAccountCreationPage(signupData: SignupData, navController: NavControl
                     }
                 }
             } else {
-                Log.d(
+                showErrorCreatingAccountDialog = true
+                Log.e(
                     "LoadingAccountCreationPage",
                     "Response : \n\t>> " + response.errorBody().toString()
                 )
@@ -95,5 +104,29 @@ fun LoadingAccountCreationPage(signupData: SignupData, navController: NavControl
                 }
             }
         }
+        if(showErrorCreatingAccountDialog){
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = Color.Black.copy(alpha = 0.5f)
+            ) {
+                AlertDialog(
+                    onDismissRequest = {
+                        navController.navigate(Screen.Login.route)
+                    },
+                    title = { Text(text = "Error") },
+                    text = { Text(text = "Error while creating your account") },
+                    confirmButton = {
+                        Button(onClick = {
+                            showErrorCreatingAccountDialog = false
+                            navController.navigate(Screen.Signup.route)
+                        }) {
+                            Text(text = "OK")
+                        }
+                    })
+
+            }
+        }
     }
 }
+
+

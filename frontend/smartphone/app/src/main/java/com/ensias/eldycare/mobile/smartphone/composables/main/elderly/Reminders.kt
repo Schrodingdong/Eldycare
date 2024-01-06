@@ -1,45 +1,23 @@
 package com.ensias.eldycare.mobile.smartphone.composables.main.elderly
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.BottomNavigation
-import androidx.compose.material.BottomNavigationItem
-import androidx.compose.material.Icon
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.compose.currentBackStackEntryAsState
-import com.ensias.eldycare.mobile.smartphone.R
-import com.ensias.eldycare.mobile.smartphone.composables.Screen
 import com.ensias.eldycare.mobile.smartphone.data.Reminder
 import java.text.SimpleDateFormat
 import java.time.Instant
 import java.util.Date
+import java.util.Locale
 
 @Composable
 fun RemindersSectionComposable(innerPadding: PaddingValues, remindersList: List<Reminder>? = null){
@@ -61,7 +39,6 @@ fun RemindersSectionComposable(innerPadding: PaddingValues, remindersList: List<
             .padding(innerPadding)
             .fillMaxWidth()
     ){
-        TopDecorationSimple("My\nReminders")
         SectionTitle(text = "My\nReminders")
         RemindersList(
             if (remindersList.isNullOrEmpty()) remindersMockList else remindersList
@@ -105,8 +82,8 @@ fun RemindersList(reminders: List<Reminder> = emptyList()) {
 
 @Composable
 fun ReminderItem(reminder: Reminder) {
-    val dateText = SimpleDateFormat("dd/MM/yyyy").format(reminder.time)
-    val timeText = "At " + SimpleDateFormat("HH:mm").format(reminder.time)
+    val dateText = SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH).format(reminder.time)
+    val timeText = "At " + SimpleDateFormat("HH:mm", Locale.FRENCH).format(reminder.time)
     OutlinedCard (
         modifier = Modifier
             .fillMaxWidth()
@@ -122,33 +99,6 @@ fun ReminderItem(reminder: Reminder) {
                 Text(text = timeText, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             Text(text = reminder.description )
-        }
-    }
-}
-
-@Composable
-fun TopDecorationSimple(text: String){
-    val s = text.split('\n')
-    Column (
-        modifier = Modifier
-            .fillMaxWidth()
-    ){
-        Row (
-            horizontalArrangement = Arrangement.Center,
-            modifier = Modifier.fillMaxWidth()
-        ){
-            Box(
-                contentAlignment = Alignment.Center,
-            ){
-                Box {
-                    Image(painter = painterResource(id = R.drawable.top_decor_rectangle), contentDescription = "top_decor_rectangle")
-                }
-                Text(
-                    text = "ELDYCARE",
-                    fontSize = MaterialTheme.typography.headlineMedium.fontSize,
-                    color = Color.White,
-                )
-            }
         }
     }
 }

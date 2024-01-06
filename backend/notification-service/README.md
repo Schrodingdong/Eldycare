@@ -19,5 +19,5 @@
 ```
 - Use the websocket web client we have provided to see the messages 
   - Connect to the websocket with the "connect" button
-  - enter an email to subscribe to it => it will subscribe to the topic `topic/notifications/{email}`
+  - enter an email to subscribe to it => it will subscribe to the topic `topic/alert/{email}`
 - The clients (the relatives) should subscribe to the notification topic of the elder they are related to

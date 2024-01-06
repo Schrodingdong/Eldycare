@@ -2,8 +2,11 @@ package com.ensias.eldycare.userservice.controller;
 
 import com.ensias.eldycare.userservice.model.UserModel;
 import com.ensias.eldycare.userservice.service.UserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.AllArgsConstructor;
 import org.apache.coyote.Response;
+import org.slf4j.Logger;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,9 +17,12 @@ import java.util.List;
 @AllArgsConstructor
 public class UserController {
     private final UserService userService;
+    private final ObjectMapper objectMapper;
+    private final Logger LOG = org.slf4j.LoggerFactory.getLogger(UserController.class);
 
     @PostMapping("/add")
     public ResponseEntity<?> addUser(@RequestBody UserModel user) {
+        LOG.info("User model : " + user);
         UserModel newUser = userService.addUser(user);
         return ResponseEntity.ok(newUser);
     }
@@ -24,11 +30,28 @@ public class UserController {
     @PutMapping("/add/urgent-contact/{urgentContactEmail}")
     public ResponseEntity<?> addUrgentContact(@PathVariable String urgentContactEmail,
             @RequestHeader("User-Email") String userEmail) {
+        ObjectNode rootNode = objectMapper.createObjectNode();
         try {
             userService.addUrgentContact(userEmail, urgentContactEmail);
-            return ResponseEntity.ok("Urgent contact added successfully");
+            rootNode.put("message", "Urgent contact added successfully");
+            return ResponseEntity.ok(rootNode);
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(e.getMessage());
+            rootNode.put("message", e.getMessage());
+            return ResponseEntity.internalServerError().body(rootNode);
+        }
+    }
+
+    @PutMapping("/add/elder-contact/{elderContactEmail}")
+    public ResponseEntity<?> addElderContact(@PathVariable String elderContactEmail,
+            @RequestHeader("User-Email") String userEmail) {
+        ObjectNode rootNode = objectMapper.createObjectNode();
+        try {
+            userService.addElderContact(userEmail, elderContactEmail);
+            rootNode.put("message", "Elder contact added successfully");
+            return ResponseEntity.ok(rootNode);
+        } catch (Exception e) {
+            rootNode.put("message", e.getMessage());
+            return ResponseEntity.internalServerError().body(rootNode);
         }
     }
 
@@ -49,6 +72,7 @@ public class UserController {
     public ResponseEntity<?> getUrgentContacts(@RequestHeader("User-Email") String userEmail) {
         return ResponseEntity.ok(userService.getUrgentContacts(userEmail));
     }
+
     @GetMapping("/get/elder-contacts")
     public ResponseEntity<?> getElderContacts(@RequestHeader("User-Email") String userEmail) {
         return ResponseEntity.ok(userService.getElderContacts(userEmail));

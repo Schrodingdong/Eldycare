@@ -16,6 +16,8 @@ public class RegisterParams {
     private String password;
     @NotBlank(message = "The username must not be null")
     private String username;
+    @NotBlank(message = "The phone must not be null")
+    private String phone;
     @NotNull(message = "The user type must not be null")
     private UserType userType;
 }

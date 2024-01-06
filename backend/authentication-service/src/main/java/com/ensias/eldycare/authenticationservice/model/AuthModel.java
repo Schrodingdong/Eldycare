@@ -24,6 +24,8 @@ public class AuthModel {
     @NotBlank
     private String email;
     @NotBlank
+    private String phone;
+    @NotBlank
     private String password;
     @NotNull
     private UserType userType;

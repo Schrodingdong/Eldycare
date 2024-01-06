@@ -17,7 +17,8 @@ fun SignupPage(navController: NavController) {
             name = "",
             email = "",
             password = "",
-            userType = UserType.RELATIVE
+            userType = UserType.RELATIVE,
+            phone = ""
         )
     )}
 

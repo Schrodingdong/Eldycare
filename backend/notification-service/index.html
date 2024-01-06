@@ -56,7 +56,7 @@
     <h1>STOMP WebSocket Client with SockJS</h1>
     <button onclick="connect()">Connect</button>
     <br/>
-    <label for="email">Enter Email:</label>
+    <label for="emailInput">Enter Email:</label>
     <input type="text" id="emailInput" placeholder="Enter your email">
     <button onclick="subscribe()">Subscribe</button>
 
@@ -67,14 +67,14 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
     <script>
         "use strict";
-        const serverUri = "http://localhost:8082/notifications-ws";
-        const topic = "/topic/notifications/";
+        const serverUri = "ws://localhost:8082/notifications-ws";
+        const topic = "/topic/alert/";
 
         let stompClient;
         let email = "";
 
         function connect() {
-            const socket = new SockJS(serverUri);
+            const socket = new WebSocket(serverUri);
             stompClient = Stomp.over(socket);
             stompClient.connect({}, onConnect, onError);
         }
@@ -90,7 +90,7 @@
         function subscribe() {
             email = document.getElementById("emailInput").value;
             const subscription = stompClient.subscribe(topic + email, onMessageReceived);
-            console.log("Subscribed to:", subscription.id);
+            console.log("Subscribed to:", subscription);
         }
 
         function onMessageReceived(message) {

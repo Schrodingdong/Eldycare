@@ -1,5 +1,6 @@
 package com.ensias.eldycare.mobile.smartphone.composables.main.relative
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -8,10 +9,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
@@ -21,7 +24,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -32,75 +34,48 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import com.ensias.eldycare.mobile.smartphone.composables.main.elderly.TopDecorationSimple
-import com.ensias.eldycare.mobile.smartphone.data.Alert
 import com.ensias.eldycare.mobile.smartphone.data.Connection
 import java.text.SimpleDateFormat
-import java.time.Instant
-import java.util.Date
+import java.util.Locale
 
-//@OptIn(ExperimentalMaterial3Api::class)
-//@Composable
-//fun ConnectionsPage(navController: NavController) {
-//    val connectionMockList = listOf(
-//        Connection("John Doe", "john@gmail.com", "1234567890", Alert(Date.from(Instant.now()), "Alert 1")),
-//        Connection("Jane Doe", "jane@gmail.com", "1234567890"),
-//        Connection("John Doe", "john@gmail.com", "1234567890"),
-//        Connection("Jane Doe", "jane@gmail.com", "1234567890"),
-//    )
-//    var showBottomSheet by remember { mutableStateOf(false) }
-//    var clickedConnection by remember { mutableStateOf(Connection("","", "")) }
-//    var sheetState = rememberModalBottomSheetState()
-//
-//    Scaffold{ innerPadding ->
-//        Column(
-//            modifier = Modifier
-//                .padding(innerPadding)
-//                .fillMaxWidth()
-//        ){
-//            TopDecorationSimple("My\nReminders")
-//            SectionTitle(text = "My\nConnections")
-//            ConnectionsList(connectionMockList, { showBottomSheet = true }, clickedConnection)
-//
-//            // bottom sheet logic
-//            if(showBottomSheet){
-//                ModalBottomSheet(
-//                    containerColor = MaterialTheme.colorScheme.surface,
-//                    onDismissRequest = { showBottomSheet = false },
-//                    sheetState = sheetState,
-//                ){
-//                    BottomSheetContent(clickedConnection)
-//                }
-//            }
-//        }
-//    }
-//}
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConnectionsSection(innerPadding: PaddingValues, connectionList: List<Connection>? = null){
     var showBottomSheet by remember { mutableStateOf(false) }
-    var clickedConnection by remember { mutableStateOf(Connection("","", "")) }
-    var sheetState = rememberModalBottomSheetState()
-    val connectionMockList = listOf(
-        Connection("John Doe", "john@gmail.com", "1234567890", Alert(Date.from(Instant.now()), "Alert 1")),
-        Connection("Jane Doe", "jane@gmail.com", "1234567890"),
-        Connection("John Doe", "john@gmail.com", "1234567890"),
-        Connection("Jane Doe", "jane@gmail.com", "1234567890"),
-    )
-    Column(
-        modifier = Modifier
-            .padding(innerPadding)
-            .fillMaxWidth()
-    ){
-        TopDecorationSimple("My\nReminders")
-        SectionTitle(text = "My\nConnections")
-        ConnectionsList(
-            connectionList = if(connectionList.isNullOrEmpty()) connectionMockList else connectionList,
-            onConnectionClick = { showBottomSheet = true },
-            clickedConnection = clickedConnection
-        )
+    val clickedConnection by remember { mutableStateOf(Connection("","", "")) }
+    val sheetState = rememberModalBottomSheetState()
 
+    Surface {
+        LazyColumn(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxWidth()
+        ){
+            item {
+                SectionTitle(text = "My\nConnections")
+            }
+            if (connectionList != null) {
+                items(connectionList.size){
+                    ConnectionItem(
+                        connection = connectionList[it],
+                        onConnectionClick = {showBottomSheet = true},
+                        clickedConnection = clickedConnection
+                    )
+                }
+            }
+            else {
+                item{
+                    Icon(Icons.Filled.Person, contentDescription = null)
+                    Text(text = "No connections yet")
+                }
+            }
+//        ConnectionsList(
+//            connectionList = if(connectionList.isNullOrEmpty()) connectionMockList else connectionList,
+//            onConnectionClick = { showBottomSheet = true },
+//            clickedConnection = clickedConnection
+//        )
+
+        }
         // bottom sheet logic
         if(showBottomSheet){
             ModalBottomSheet(
@@ -111,6 +86,7 @@ fun ConnectionsSection(innerPadding: PaddingValues, connectionList: List<Connect
                 BottomSheetContent(clickedConnection)
             }
         }
+
     }
 
 }
@@ -133,29 +109,36 @@ fun SectionTitle(text: String){
 
 }
 
-@Composable
-fun ConnectionsList(connectionList: List<Connection> = emptyList(), onConnectionClick: () -> Unit, clickedConnection: Connection) {
-    Column (
-        modifier = Modifier
-            .verticalScroll(rememberScrollState())
-            .fillMaxWidth()
-            .padding(start = 32.dp, end = 32.dp, bottom = 8.dp)
-    ){
-        connectionList.forEach { connection ->
-            ConnectionItem(connection, onConnectionClick, clickedConnection)
-        }
-    }
-}
+//@Composable
+//fun ConnectionsList(connectionList: List<Connection> = emptyList(), onConnectionClick: () -> Unit, clickedConnection: Connection) {
+//    LazyColumn(
+//        modifier = Modifier
+//            .verticalScroll(rememberScrollState())
+//            .fillMaxHeight()
+//            .fillMaxWidth()
+//            .padding(start = 32.dp, end = 32.dp, bottom = 8.dp)
+//    ){
+//
+//        items(connectionList.size){
+//            ConnectionItem(connectionList[it], onConnectionClick, clickedConnection)
+//            Divider()
+//        }
+////        connectionList.forEach { connection ->
+////            ConnectionItem(connection, onConnectionClick, clickedConnection)
+////        }
+//    }
+//}
 
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConnectionItem(connection: Connection, onConnectionClick: () -> Unit, clickedConnection: Connection) {
+    Log.d("ConnectionItem", "ConnectionItem: ${connection.toString()}")
     OutlinedCard (
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
+            .padding(PaddingValues(horizontal = 32.dp, vertical = 8.dp)),
         onClick = {
             /*TODO : make a bottom sheet appear with the needed info on screen */
             clickedConnection.name = connection.name
@@ -228,7 +211,7 @@ fun BottomSheetAddReminder(){
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 32.dp, end = 32.dp, bottom = 56.dp, )
+            .padding(start = 32.dp, end = 32.dp, bottom = 56.dp,)
     ) {
         Text(
             text = "Add Reminder",
@@ -306,7 +289,7 @@ fun BottomSheetConnectionInfo(connection: Connection){
         Spacer(modifier = Modifier.height(16.dp))
         if(connection.lastAlert != null){
             Text(
-                text = "Last Alert: ${SimpleDateFormat("dd/MM/yyyy").format(connection.lastAlert?.time!!)}",
+                text = "Last Alert: ${SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH).format(connection.lastAlert?.time!!)}",
                 fontWeight = FontWeight.Light,
                 fontSize = MaterialTheme.typography.bodySmall.fontSize
             )

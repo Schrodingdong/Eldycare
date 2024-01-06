@@ -62,4 +62,8 @@ public class UserService {
                 userInfo.getUserType() == null ? user.getUserType() : userInfo.getUserType());
         return userRepository.save(user);
     }
+
+    public void addElderContact(String userEmail, String elderContactEmail) {
+        userRepository.addElderContact(userEmail, elderContactEmail);
+    }
 }
