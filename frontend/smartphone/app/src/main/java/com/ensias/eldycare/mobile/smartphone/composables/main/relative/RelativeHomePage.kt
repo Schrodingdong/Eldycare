@@ -1,6 +1,12 @@
 package com.ensias.eldycare.mobile.smartphone.composables.main.relative
 
+import android.Manifest
+import android.content.Context
+import android.os.Build
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,6 +27,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,18 +45,29 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @OptIn(DelicateCoroutinesApi::class)
 @Composable
-fun RelativeHomePage(navController: NavController) {
+fun RelativeHomePage(navController: NavController, context: Context) {
     var showAddConnectionPopup by remember { mutableStateOf(false) }
     var connectionList by remember { mutableStateOf(emptyList<Connection>()) }
     // Trigger the refresh by changing this state
     val isRefreshing by remember { mutableStateOf(false) }
+    // permission to send notifications
+    var hasNotificationPermission by remember { mutableStateOf(false) }
+    // request notification permission
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { hasNotificationPermission = it }
+    )
 
     LaunchedEffect(Unit){
-        loadConnectionList(onConnectionListChange = { connectionList = it })
+        loadConnectionList(onConnectionListChange = { connectionList = it }, context = context)
+        Log.d("RelativeHomePage", "Requesting notification permission")
+        permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
     }
 
     Scaffold(
@@ -63,7 +81,7 @@ fun RelativeHomePage(navController: NavController) {
         }
     ){ innerPadding ->
         SwipeRefresh(state = rememberSwipeRefreshState(isRefreshing = isRefreshing), onRefresh = {
-            loadConnectionList(onConnectionListChange = { connectionList = it })
+            loadConnectionList(onConnectionListChange = { connectionList = it }, context = context)
         }) {
             ConnectionsSection(
                 innerPadding = innerPadding,
@@ -77,7 +95,7 @@ fun RelativeHomePage(navController: NavController) {
                     GlobalScope.launch {
                         ApiClient().authApi.addElderContact(email).body()?.let {
                             Log.d("RelativeHomePage", "Added connection : $it")
-                            loadConnectionList(onConnectionListChange = { connectionList = it })
+                            loadConnectionList(onConnectionListChange = { connectionList = it }, context = context)
                         }
                     }.let {
                         showAddConnectionPopup = false
@@ -89,7 +107,7 @@ fun RelativeHomePage(navController: NavController) {
 }
 
 @OptIn(DelicateCoroutinesApi::class)
-fun loadConnectionList(onConnectionListChange: (List<Connection>) -> Unit) {
+fun loadConnectionList(onConnectionListChange: (List<Connection>) -> Unit, context: Context) {
     GlobalScope.launch {
         ApiClient().authApi.getElderContacts().body()?.let {
             Log.d("RelativeHomePage", "Got connection list : $it")
@@ -107,7 +125,7 @@ fun loadConnectionList(onConnectionListChange: (List<Connection>) -> Unit) {
             // TODO : subscribe to the new connections with websockets
             newConnections.forEach {
                 Log.d("RelativeHomePage", "Subscribing to ${it.email}")
-                val websocketClient = NotificationWebsocketClient(it.email)
+                val websocketClient = NotificationWebsocketClient(it.email, context = context)
                 websocketClient.connect()
             }
 

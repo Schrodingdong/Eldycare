@@ -1,8 +1,13 @@
 package com.ensias.eldycare.mobile.smartphone
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
@@ -18,13 +23,18 @@ import com.ensias.eldycare.mobile.smartphone.composables.auth.login.LoginPage
 import com.ensias.eldycare.mobile.smartphone.composables.auth.signup.SignupPage
 import com.ensias.eldycare.mobile.smartphone.composables.main.elderly.ElderHomePage
 import com.ensias.eldycare.mobile.smartphone.composables.main.relative.RelativeHomePage
-import com.ensias.eldycare.mobile.smartphone.service.AlertService
+import com.ensias.eldycare.mobile.smartphone.data.Constants
 import com.ensias.eldycare.mobile.smartphone.theme.ComposeTestTheme
 
 class MainActivity : ComponentActivity() {
+    companion object {
+        lateinit var notificationManager: NotificationManager
+    }
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val context: Context = this
         setContent {
             ComposeTestTheme {
                 val navController = rememberNavController()
@@ -53,12 +63,22 @@ class MainActivity : ComponentActivity() {
                         route = "main-relative"
                     ){
                         composable(Screen.RelativeHomePage.route) {
-                            RelativeHomePage(navController)
+                            RelativeHomePage(navController, context)
                         }
                     }
                 }
             }
         }
+
+        // Notification Channel
+        val channel = NotificationChannel(
+            Constants.CHANNEL_ID,
+            "Alert Notifications",
+            NotificationManager.IMPORTANCE_HIGH
+        )
+
+        notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(channel)
     }
 }
 
