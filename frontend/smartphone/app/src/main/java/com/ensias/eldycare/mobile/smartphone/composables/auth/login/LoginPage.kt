@@ -36,18 +36,12 @@ import androidx.navigation.NavController
 import com.ensias.eldycare.mobile.smartphone.R
 import com.ensias.eldycare.mobile.smartphone.UserType
 import com.ensias.eldycare.mobile.smartphone.api.ApiClient
-import com.ensias.eldycare.mobile.smartphone.api.NotificationWebsocketClient
 import com.ensias.eldycare.mobile.smartphone.composables.Screen
 import com.ensias.eldycare.mobile.smartphone.composables.auth.signup.TopDecorWithText
 import com.ensias.eldycare.mobile.smartphone.data.LoginData
 import com.ensias.eldycare.mobile.smartphone.data.model.AuthLoginModel
-import com.ensias.eldycare.mobile.smartphone.service.AlertService
 import com.ensias.eldycare.mobile.smartphone.service.AuthService
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 /**
  * LOGIN PAGE

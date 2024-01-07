@@ -23,7 +23,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.addEndpoint("/notifications-ws")
 //                .setHandshakeHandler() //TODO : https://www.youtube.com/watch?v=LdQY-OUM2mk
                 .setAllowedOriginPatterns("*");
-//                .withSockJS();
         registry.addEndpoint("/notifications-ws")
 //                .setHandshakeHandler()
                 .setAllowedOriginPatterns("*")

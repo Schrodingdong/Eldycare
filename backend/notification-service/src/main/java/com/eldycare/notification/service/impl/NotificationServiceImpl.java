@@ -41,6 +41,12 @@ public class NotificationServiceImpl implements NotificationService {
     private transient final Logger logger = LoggerFactory.getLogger(NotificationServiceImpl.class);
 
     @Override
+    public void sendToElderTopic(NotificationDto notification){
+        logger.info("sendToElderTopic - notification: {}", notification);
+        webSocketNotificationSender.sendNotification(notification.getElderEmail(), notification.getAlertMessage());
+    }
+
+    @Override
     public void sendNotification(NotificationDto notificationDto) {
 
         String elderEmail = notificationDto.getElderEmail();

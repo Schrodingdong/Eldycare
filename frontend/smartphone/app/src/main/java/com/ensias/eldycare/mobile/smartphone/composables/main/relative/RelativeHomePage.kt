@@ -31,14 +31,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import com.ensias.eldycare.mobile.smartphone.api.ApiClient
-import com.ensias.eldycare.mobile.smartphone.api.NotificationWebsocketClient
+import com.ensias.eldycare.mobile.smartphone.api.websocket.NotificationWebsocketClient
 import com.ensias.eldycare.mobile.smartphone.composables.main.TopAppBarEldycare
 import com.ensias.eldycare.mobile.smartphone.data.Connection
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
+@OptIn(DelicateCoroutinesApi::class)
 @Composable
 fun RelativeHomePage(navController: NavController) {
     var showAddConnectionPopup by remember { mutableStateOf(false) }
@@ -86,6 +88,7 @@ fun RelativeHomePage(navController: NavController) {
     }
 }
 
+@OptIn(DelicateCoroutinesApi::class)
 fun loadConnectionList(onConnectionListChange: (List<Connection>) -> Unit) {
     GlobalScope.launch {
         ApiClient().authApi.getElderContacts().body()?.let {
@@ -104,10 +107,8 @@ fun loadConnectionList(onConnectionListChange: (List<Connection>) -> Unit) {
             // TODO : subscribe to the new connections with websockets
             newConnections.forEach {
                 Log.d("RelativeHomePage", "Subscribing to ${it.email}")
-                val client = NotificationWebsocketClient(it.email)
-                client.connect().let {
-                    client.subscribe()
-                }
+                val websocketClient = NotificationWebsocketClient(it.email)
+                websocketClient.connect()
             }
 
         }

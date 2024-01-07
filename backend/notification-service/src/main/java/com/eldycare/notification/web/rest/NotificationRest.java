@@ -25,7 +25,7 @@ public class NotificationRest {
     @PostMapping("/send")
     public ResponseEntity<?> sendNotification(@RequestBody NotificationDto notification) {
         try {
-            notificationService.sendNotification(notification);
+            notificationService.sendToElderTopic(notification);
             return SystemUtils.getResponseEntity(ServiceConstants.NOTIFICATION_SENT_SUCCESSFULLY, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();

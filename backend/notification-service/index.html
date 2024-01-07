@@ -50,6 +50,12 @@
       #messages p {
           margin-bottom: 10px;
       }
+
+      #sendButton {
+            background-color: #ff00da;
+            color: white;
+            cursor: pointer;
+      }
   </style>
 </head>
 <body>
@@ -59,6 +65,10 @@
     <label for="emailInput">Enter Email:</label>
     <input type="text" id="emailInput" placeholder="Enter your email">
     <button onclick="subscribe()">Subscribe</button>
+    <label for="messageInput">send message:</label>
+    <input type="text" id="messageInput" placeholder="Enter your message">
+    <button onclick="sendMessage()" id="sendButton">Send</button>
+
 
     <div id="messages"></div>
 
@@ -98,6 +108,12 @@
             const messagesDiv = document.getElementById("messages");
             const messageContent = message.body;
             messagesDiv.innerHTML += `<p>New Notification for ${email}: ${messageContent}</p>`;
+        }
+
+        function sendMessage() {
+            const messageInput = document.getElementById("messageInput");
+            const message = messageInput.value;
+            stompClient.send(topic + email, {}, JSON.stringify({message, email}));
         }
 
 
