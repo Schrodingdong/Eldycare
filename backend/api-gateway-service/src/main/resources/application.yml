@@ -29,5 +29,7 @@ spring:
               - OPTIONS
       discovery:
         enabled: true
+      routes:
+        - id:
   application:
     name: gateway-service
