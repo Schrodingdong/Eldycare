@@ -15,16 +15,18 @@ class JWTInterceptor : Interceptor {
         return chain.proceed(request)
     }
 }
-object RetrofitClient {
-    private val okHttpClient = OkHttpClient.Builder()
+object AppOkHttpClient {
+    val client = OkHttpClient.Builder()
         .addInterceptor(JWTInterceptor())
         .build()
+}
+object RetrofitClient {
 
     val retrofit: Retrofit by lazy {
         Retrofit.Builder()
             .baseUrl(ApiClient.BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
-            .client(okHttpClient)
+            .client(AppOkHttpClient.client)
             .build()
     }
 }
@@ -36,7 +38,7 @@ class ApiClient{
         var email: String = ""
         // TODO : change with the ip of your machine (localhost wont work)
         val HOSTNAME = "10.0.2.2"
-        val PORT = "8082"
+        val PORT = "8888"
         val BASE_URL = "http://10.0.2.2:8888/"
     }
     val authApi: AuthApi = RetrofitClient.retrofit.create(AuthApi::class.java)

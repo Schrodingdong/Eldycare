@@ -77,7 +77,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
     <script>
         "use strict";
-        const serverUri = "ws://localhost:8082/notifications-ws";
+        const serverUri = "ws://localhost:8888/notification/notifications-ws";
         const topic = "/topic/alert/";
 
         let stompClient;
@@ -86,7 +86,9 @@
         function connect() {
             const socket = new WebSocket(serverUri);
             stompClient = Stomp.over(socket);
-            stompClient.connect({}, onConnect, onError);
+            stompClient.connect({
+                    "Authorization": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJvdXNzYW1hQGdtYWlsLmNvbSIsImV4cCI6MTcwNDY0MjQ0NywiaWF0IjoxNzA0NjI0NDQ3fQ.wizf7nRuQ80kS6bGvNF-on_uumDoip5szcLluERbj89cNDPl-MakFJIKRHl2Nq1IJ1ImOEYjkaZn1B1MvYrIzg"
+                }, onConnect, onError);
         }
 
         function onConnect() {
