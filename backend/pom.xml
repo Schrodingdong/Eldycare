@@ -22,6 +22,7 @@
         <module>authentication-service</module>
         <module>notification-service</module>
         <module>user-service</module>
+        <module>reminder-service</module>
     </modules>
 
     <properties>

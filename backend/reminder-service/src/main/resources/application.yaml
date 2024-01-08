@@ -1,0 +1,22 @@
+server:
+  port: 8083
+
+spring:
+  data:
+    mongodb:
+         uri: mongodb://${MongoDB_DATABASE}:${MongoDB_PASSWORD}@${MongoDB_CLUSTER_URI}/${MongoDB_DATABASE}?retryWrites=true&w=majority
+  application:
+    name: reminder-service
+
+amqp:
+    queue: reminder-queue
+    exchange: reminder-exchange
+    routingkey: 'reminder.#.*'
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
+    register-with-eureka: true
+    fetch-registry: true
+

@@ -11,7 +11,14 @@ Backend component of the Eldycare project. We will be following a **Microservice
     - `NEO4J_USERNAME=neo4j`
     - `NEO4J_PASSWORD=saga-pablo-lagoon-java-license-4169`
     - Note : change the password to whathever you have set in your local neo4j instance
-
+    
+- MongoDB Connection
+  - Add these variables to your environment
+    - `MongoDB_CLUSTER_URI=eldycare-cluster.xcn4yoa.mongodb.net`
+    - `MongoDB_DATABASE=eldycare`
+    - `MongoDB_USERNAME=yassinouhadi`
+    - `MongoDB_PASSWORD=9ZdBVB78UH6Tb4O7`
+    
 ## Components
 - [x] API Gateway
   - [x] Filter to connect with the Authentication Service for JWT validation
