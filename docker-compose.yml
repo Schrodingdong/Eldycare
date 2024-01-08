@@ -1,0 +1,50 @@
+version: '3.0'
+volumes:
+  postgres-data:
+  neo4j-data:
+  mongo-data:
+
+services:
+  postgres:
+    container_name: postgresql
+    image: postgres:latest
+    ports:
+      - 5432:5432
+    volumes:
+        - postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: eldycare
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+  mongodb:
+    container_name: mongodb
+    image: mongo:4.4
+#    image: mongo:latest
+    ports:
+      - 27017:27017
+    volumes:
+      - mongo-data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${DB_NAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${DB_PWD}
+      MONGO_INITDB_DATABASE: ${DB_NAME}
+
+  neo4j:
+    container_name: neo4j
+    image: neo4j:latest
+    ports:
+      - 7474:7474
+      - 7687:7687
+    volumes:
+      - neo4j-data:/data
+    environment:
+      - NEO4J_AUTH=neo4j/saga-pablo-lagoon-java-license-4169
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3.12-management
+    ports:
+      - 5672:5672
+      - 15672:15672
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
