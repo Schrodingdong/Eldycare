@@ -12,5 +12,5 @@
     <color name="service_notification_gradient_start">#FF31768C</color>
     <color name="service_notification_gradient_end">#0A5268</color>
     <color name="alert_notification_gradient_start">#FF7474</color>
-    <color name="alert_notification_gradient_end">#F6BCBC</color>
+    <color name="alert_notification_gradient_end">#AF0909</color>
 </resources>

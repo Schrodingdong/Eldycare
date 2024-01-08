@@ -32,9 +32,4 @@ public class NotificationRest {
             return SystemUtils.getResponseEntity(ServiceConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-    @PostMapping("/test/send")
-    public void sendTestNotification(@RequestBody String string) {
-        webSocketNotificationSender.sendNotification("test", string);
-    }
 }

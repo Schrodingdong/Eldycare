@@ -1,6 +1,7 @@
 package com.ensias.eldycare.mobile.smartphone.api
 
 import com.ensias.eldycare.mobile.smartphone.UserType
+import com.google.gson.Gson
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Response
@@ -40,6 +41,7 @@ class ApiClient{
         val HOSTNAME = "192.168.11.173"
         val PORT = "8888"
         val BASE_URL = "http://$HOSTNAME:$PORT/"
+        val gson = Gson()
     }
     val authApi: AuthApi = RetrofitClient.retrofit.create(AuthApi::class.java)
 }

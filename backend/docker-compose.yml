@@ -24,9 +24,9 @@ services:
     volumes:
       - mongo-data:/data/db
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${DB_NAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${DB_PWD}
-      MONGO_INITDB_DATABASE: ${DB_NAME}
+      MONGO_INITDB_ROOT_USERNAME: mongo
+      MONGO_INITDB_ROOT_PASSWORD: mongo
+      MONGO_INITDB_DATABASE: eldycare
 
   neo4j:
     container_name: neo4j

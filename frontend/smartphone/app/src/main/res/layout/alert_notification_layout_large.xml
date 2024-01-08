@@ -34,10 +34,20 @@
             android:id="@+id/notificationText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="alert message"
+            android:text="alert message !!"
             android:textColor="@android:color/white"
-            android:textSize="12sp"
+            android:textSize="14sp"
+            android:paddingVertical="8dp"
+            android:textFontWeight="500"
             android:layout_below="@id/notificationTitle" />
+        <LinearLayout
+            android:id="@+id/badge_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:orientation="horizontal">
+
+        </LinearLayout>
     </LinearLayout>
 
 </RelativeLayout>

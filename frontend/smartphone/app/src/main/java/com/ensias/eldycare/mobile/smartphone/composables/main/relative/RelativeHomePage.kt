@@ -43,6 +43,7 @@ import com.ensias.eldycare.mobile.smartphone.api.ApiClient
 import com.ensias.eldycare.mobile.smartphone.api.websocket.NotificationWebsocketClient
 import com.ensias.eldycare.mobile.smartphone.composables.main.TopAppBarEldycare
 import com.ensias.eldycare.mobile.smartphone.data.Connection
+import com.ensias.eldycare.mobile.smartphone.service.ConnectionService
 import com.ensias.eldycare.mobile.smartphone.service.NotificationService
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
@@ -128,25 +129,34 @@ fun RelativeHomePage(navController: NavController, context: Context) {
     }
 }
 
-@OptIn(DelicateCoroutinesApi::class)
-fun loadConnectionList(onConnectionListChange: (List<Connection>) -> Unit) {
-    GlobalScope.launch {
-        ApiClient().authApi.getElderContacts().body()?.let {
-            Log.d("RelativeHomePage", "Got connection list : $it")
-            val newConnections = it.map {
-                Connection(
-                    email = it.email,
-                    name = it.username,
-                    phone = if(it.phone == null) "" else it.phone, // TODO phone is never nullable
-                    lastAlert = null // TODO
-                )
-            }
-            // set the list to trigger composition
-            onConnectionListChange(newConnections)
-        }
-
-    }
+fun loadConnectionList(onConnectionListChange: (List<Connection>) -> Unit){
+    // set the global connection list object
+    ConnectionService.loadConnectionList()
+    // set the list to trigger composition
+    if(ConnectionService.connectionList != null)
+        onConnectionListChange(ConnectionService.connectionList!!)
+    else
+        onConnectionListChange(emptyList())
 }
+//@OptIn(DelicateCoroutinesApi::class)
+//fun loadConnectionList(onConnectionListChange: (List<Connection>) -> Unit) {
+//    GlobalScope.launch {
+//        ApiClient().authApi.getElderContacts().body()?.let {
+//            Log.d("RelativeHomePage", "Got connection list : $it")
+//            val newConnections = it.map {
+//                Connection(
+//                    email = it.email,
+//                    name = it.username,
+//                    phone = if(it.phone == null) "" else it.phone, // TODO phone is never nullable
+//                    lastAlert = null // TODO
+//                )
+//            }
+//            // set the list to trigger composition
+//            onConnectionListChange(newConnections)
+//        }
+//
+//    }
+//}
 
 @Composable
 fun AddConnectionPopup(onDismiss: () -> Unit, onAddConnection: (String) -> Unit) {

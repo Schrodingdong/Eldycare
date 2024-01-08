@@ -10,7 +10,9 @@ import android.content.Intent
 import android.net.Uri
 import android.os.IBinder
 import android.util.Log
+import android.view.LayoutInflater
 import android.widget.RemoteViews
+import android.widget.TextView
 import androidx.core.app.NotificationCompat
 import com.ensias.eldycare.mobile.smartphone.api.ApiClient
 import com.ensias.eldycare.mobile.smartphone.api.websocket.NotificationWebsocketClient
@@ -22,6 +24,7 @@ import retrofit2.Response
 
 
 class NotificationService : Service(){
+    lateinit var notificationManager: NotificationManager
     /**
      * Send notification to be pushed to the elder topic
      */
@@ -31,30 +34,56 @@ class NotificationService : Service(){
         } ?: Response.error(400, ResponseBody.create(null, "Error"))
     }
 
-    lateinit var notificationManager: NotificationManager
     // For the relatives
-    fun buildAlertNotification(context: Context, notificationMessage: String) {
+    fun buildAlertNotification(context: Context, notificationMessage: NotificationModel) {
         // Create a visually appealing and informative notification
         val customView = RemoteViews(packageName, com.ensias.eldycare.mobile.smartphone.R.layout.alert_notification_layout)
         val customViewLarge = RemoteViews(packageName, com.ensias.eldycare.mobile.smartphone.R.layout.alert_notification_layout_large)
-        customView.setTextViewText(com.ensias.eldycare.mobile.smartphone.R.id.notificationText, notificationMessage)
-        customViewLarge.setTextViewText(com.ensias.eldycare.mobile.smartphone.R.id.notificationText, notificationMessage)
+        customView.setTextViewText(
+            com.ensias.eldycare.mobile.smartphone.R.id.notificationText,
+            notificationMessage.alertMessage
+        )
+
+        val notificationLongString =
+            "${notificationMessage.alertMessage}\n" +
+            "Alert Time: ${notificationMessage.alertTime}\n" +
+            "Location: ${notificationMessage.location}\n"
+        customViewLarge.setTextViewText(
+            com.ensias.eldycare.mobile.smartphone.R.id.notificationText,
+            notificationLongString
+        )
+
+
+        // init badges
+        notificationMessage.alertType.forEach {
+            val badge = RemoteViews(packageName, com.ensias.eldycare.mobile.smartphone.R.layout.alert_type_badge_layout)
+            badge.setTextViewText(
+                com.ensias.eldycare.mobile.smartphone.R.id.custom_badge,
+                it.name
+            )
+            customViewLarge.addView(
+                com.ensias.eldycare.mobile.smartphone.R.id.badge_container,
+                badge
+            )
+        }
 
         // Create an Intent to make a call
         val callIntent = Intent(Intent.ACTION_DIAL)
-        callIntent.data = Uri.parse("tel:0123456789")
+        if(notificationMessage.elderEmail != null)
+            ConnectionService.connectionList!!.find { it.email == notificationMessage.elderEmail }?.let {
+                callIntent.data = Uri.parse("tel:${it.phone}")
+            }
+        else
+            callIntent.data = Uri.parse("tel:00000000000")
         val callPendingIntent = PendingIntent.getActivity(this, 0, callIntent, PendingIntent.FLAG_UPDATE_CURRENT)
 
+        // initialize notification builder
         val builder = NotificationCompat.Builder(this, Constants.CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_dialog_alert)
             .setPriority(NotificationCompat.PRIORITY_HIGH) // Adjust priority as needed
             .setCategory(NotificationCompat.CATEGORY_CALL) // Consider a more appropriate category
-            .setCustomContentView(
-                customView
-            )
-            .setCustomBigContentView(
-                customViewLarge
-            )
+            .setCustomContentView(customView)
+            .setCustomBigContentView(customViewLarge)
             .setSilent(false)
             .setContentIntent(callPendingIntent)
             .setAutoCancel(true)

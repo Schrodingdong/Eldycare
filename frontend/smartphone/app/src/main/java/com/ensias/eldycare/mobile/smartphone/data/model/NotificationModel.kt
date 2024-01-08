@@ -7,5 +7,6 @@ data class NotificationModel(
     val alertMessage: String,
     val alertType: List<AlertType>,
     val alertTime: String,
-    val location: String
+    val location: String,
+    val relativeEmail: List<String>? = null
 )
