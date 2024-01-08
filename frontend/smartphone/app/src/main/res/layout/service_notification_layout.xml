@@ -1,0 +1,46 @@
+<!-- res/layout/custom_notification_layout.xml -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/service_notification_gradient">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical">
+
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/hand_holding_hand_solid" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="8dp">
+            <TextView
+                android:id="@+id/notificationTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Eldycare"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"/>
+
+            <TextView
+                android:id="@+id/notificationText"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="Caring is our top priority !"
+                android:textColor="@android:color/white"
+                android:textSize="12sp"
+                android:layout_below="@id/notificationTitle" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+    <!-- Add other views as needed -->
+
+</RelativeLayout>
+

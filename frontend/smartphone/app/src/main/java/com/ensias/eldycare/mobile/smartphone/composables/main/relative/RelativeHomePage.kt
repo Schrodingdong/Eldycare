@@ -2,7 +2,9 @@ package com.ensias.eldycare.mobile.smartphone.composables.main.relative
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.os.Build
+import android.provider.Settings
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -41,11 +43,11 @@ import com.ensias.eldycare.mobile.smartphone.api.ApiClient
 import com.ensias.eldycare.mobile.smartphone.api.websocket.NotificationWebsocketClient
 import com.ensias.eldycare.mobile.smartphone.composables.main.TopAppBarEldycare
 import com.ensias.eldycare.mobile.smartphone.data.Connection
+import com.ensias.eldycare.mobile.smartphone.service.NotificationService
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -64,11 +66,31 @@ fun RelativeHomePage(navController: NavController, context: Context) {
         onResult = { hasNotificationPermission = it }
     )
 
+
+
+
+    // Start the service
+    val serviceIntent = Intent(context, NotificationService::class.java)
+    val connectionArrayList = ArrayList<String>()
+    connectionList.forEach {
+        connectionArrayList.add(it.email)
+    }
+    serviceIntent.putStringArrayListExtra("connection-list", connectionArrayList)
+    serviceIntent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+    context.startService(serviceIntent)
+
+
+
+
     LaunchedEffect(Unit){
-        loadConnectionList(onConnectionListChange = { connectionList = it }, context = context)
+        loadConnectionList(onConnectionListChange = { connectionList = it })
         Log.d("RelativeHomePage", "Requesting notification permission")
         permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
     }
+
+
+
+
 
     Scaffold(
         topBar = { TopAppBarEldycare() },
@@ -81,7 +103,7 @@ fun RelativeHomePage(navController: NavController, context: Context) {
         }
     ){ innerPadding ->
         SwipeRefresh(state = rememberSwipeRefreshState(isRefreshing = isRefreshing), onRefresh = {
-            loadConnectionList(onConnectionListChange = { connectionList = it }, context = context)
+            loadConnectionList(onConnectionListChange = { connectionList = it })
         }) {
             ConnectionsSection(
                 innerPadding = innerPadding,
@@ -95,7 +117,7 @@ fun RelativeHomePage(navController: NavController, context: Context) {
                     GlobalScope.launch {
                         ApiClient().authApi.addElderContact(email).body()?.let {
                             Log.d("RelativeHomePage", "Added connection : $it")
-                            loadConnectionList(onConnectionListChange = { connectionList = it }, context = context)
+                            loadConnectionList(onConnectionListChange = { connectionList = it })
                         }
                     }.let {
                         showAddConnectionPopup = false
@@ -107,7 +129,7 @@ fun RelativeHomePage(navController: NavController, context: Context) {
 }
 
 @OptIn(DelicateCoroutinesApi::class)
-fun loadConnectionList(onConnectionListChange: (List<Connection>) -> Unit, context: Context) {
+fun loadConnectionList(onConnectionListChange: (List<Connection>) -> Unit) {
     GlobalScope.launch {
         ApiClient().authApi.getElderContacts().body()?.let {
             Log.d("RelativeHomePage", "Got connection list : $it")
@@ -121,14 +143,6 @@ fun loadConnectionList(onConnectionListChange: (List<Connection>) -> Unit, conte
             }
             // set the list to trigger composition
             onConnectionListChange(newConnections)
-
-            // TODO : subscribe to the new connections with websockets
-            newConnections.forEach {
-                Log.d("RelativeHomePage", "Subscribing to ${it.email}")
-                val websocketClient = NotificationWebsocketClient(it.email, context = context)
-                websocketClient.connect()
-            }
-
         }
 
     }
