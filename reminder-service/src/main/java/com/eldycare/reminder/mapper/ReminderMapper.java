@@ -10,13 +10,4 @@ public interface ReminderMapper extends EntityMapper<ReminderDto, Reminder> {
     Reminder toReminder(ReminderDto reminderDto);
 
     ReminderDto toReminderDto(Reminder reminder);
-
-    default Reminder toReminderEntity(ReminderDto reminderDto) {
-        return new Reminder(
-                reminderDto.getElderEmail(),
-                reminderDto.getRelativeEmail(),
-                reminderDto.getDescription(),
-                reminderDto.getReminderDateTime()
-        );
-    }
 }

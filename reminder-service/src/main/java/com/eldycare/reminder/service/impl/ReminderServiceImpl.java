@@ -25,7 +25,8 @@ public class ReminderServiceImpl implements ReminderService {
     @Autowired
     private WebSocketReminderSender webSocketReminderSender;
 
-    private ReminderMapper reminderMapper;
+//    @Autowired
+//    private ReminderMapper reminderMapper;
 
     @Value("${amqp.queue}")
     private String reminderQueue;
@@ -36,7 +37,13 @@ public class ReminderServiceImpl implements ReminderService {
     public void sendReminder(ReminderDto reminderDto) {
 
         String elderEmail = reminderDto.getElderEmail();
-        Reminder reminder = reminderMapper.toReminderEntity(reminderDto);
+//        Reminder reminder = reminderMapper.toReminder(reminderDto);
+        Reminder reminder = new Reminder(
+                reminderDto.getElderEmail(),
+                reminderDto.getRelativeEmail(),
+                reminderDto.getDescription(),
+                reminderDto.getReminderDateTime()
+        );
         logger.info("sending this reminder to elder : {}", reminder);
         sendReminderToRelative(reminder);
     }
