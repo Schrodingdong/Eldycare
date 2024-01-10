@@ -23,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.navigation.NavController
@@ -31,10 +32,14 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.ensias.eldycare.mobile.smartphone.MainActivity
 import com.ensias.eldycare.mobile.smartphone.composables.Screen
 import com.ensias.eldycare.mobile.smartphone.composables.main.TopAppBarEldycare
+import com.ensias.eldycare.mobile.smartphone.data.Reminder
+import com.ensias.eldycare.mobile.smartphone.data.model.ReminderCalendarEventModel
 import com.ensias.eldycare.mobile.smartphone.service.AlertService
 import com.ensias.eldycare.mobile.smartphone.service.NotificationService
 import com.ensias.eldycare.mobile.smartphone.service.ReminderService
 import com.ensias.eldycare.mobile.smartphone.service.content_provider.CalendarProvider
+import java.time.Instant
+import java.util.Date
 
 
 enum class Section {
@@ -49,6 +54,7 @@ fun ElderHomePage(navController: NavController, context: Context){
         Screen.AlertsPage
     )
     var section by remember { mutableStateOf(Section.REMINDERS) }
+    var reminderList by remember { mutableStateOf(listOf<Reminder>()) }
 
     // Start the reminders service
     val serviceIntent = Intent(context, ReminderService::class.java)
@@ -59,6 +65,7 @@ fun ElderHomePage(navController: NavController, context: Context){
     LaunchedEffect(Unit){
         // TODO ACTIVATE THE MOCKS
 //        AlertService().mockSendAlert()
+        // Read from calendar
         ActivityCompat.requestPermissions(
             context as MainActivity,
             arrayOf(
@@ -67,7 +74,16 @@ fun ElderHomePage(navController: NavController, context: Context){
             ),
             101
         )
-        CalendarProvider(context).readFromCalendar()
+        CalendarProvider(context).readFromCalendar().forEach{
+            val reminderEl = Reminder(
+                time = Date.from(Instant.ofEpochMilli(it.dtstart)),
+                description = it.title.subSequence(
+                    startIndex = ReminderCalendarEventModel.TITLE_PREFIX.length,
+                    endIndex = it.title.length
+                ).toString()
+            )
+            reminderList = reminderList + reminderEl
+        }
     }
 
     Scaffold(
@@ -107,9 +123,21 @@ fun ElderHomePage(navController: NavController, context: Context){
         }
     ){ innerPadding ->
         if(section == Section.REMINDERS){
-            RemindersSectionComposable(innerPadding = innerPadding)
+            RemindersSectionComposable(innerPadding = innerPadding, remindersList = reminderList)
         } else if(section == Section.ALERTS){
             AlertSectionComposable(innerPadding = innerPadding)
         }
+    }
+}
+
+@Preview
+@Composable
+fun ElderHomePagePreview(){
+    Scaffold(
+        topBar = {
+            TopAppBarEldycare()
+        },
+    ){ innerPadding ->
+        RemindersSectionComposable(innerPadding = innerPadding)
     }
 }

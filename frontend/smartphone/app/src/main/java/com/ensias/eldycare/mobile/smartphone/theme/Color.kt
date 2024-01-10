@@ -17,3 +17,7 @@ val Teal100 = Color(0xFF179A7D)
 val Red40 = Color(0xFFC23D3D)
 val Red80 = Color(0xFFD14545)
 val RedTransparent40 = Color(0x66C23D3D)
+
+val gray = Color(0xFFE0E0E0)
+val grayDark = Color(0xFFBDBDBD)
+val grayLight = Color(0xFFEEEEEE)
