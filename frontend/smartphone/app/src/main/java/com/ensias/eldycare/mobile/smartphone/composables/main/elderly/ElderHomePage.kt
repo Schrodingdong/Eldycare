@@ -57,10 +57,11 @@ fun ElderHomePage(navController: NavController, context: Context){
     var reminderList by remember { mutableStateOf(listOf<Reminder>()) }
 
     // Start the reminders service
-    val serviceIntent = Intent(context, ReminderService::class.java)
-    serviceIntent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
-    context.startService(serviceIntent)
-
+    LaunchedEffect(key1 = null, block = {
+        val serviceIntent = Intent(context, ReminderService::class.java)
+        serviceIntent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+        context.startService(serviceIntent)
+    })
 
     LaunchedEffect(Unit){
         // TODO ACTIVATE THE MOCKS

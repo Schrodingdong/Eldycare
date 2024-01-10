@@ -35,6 +35,7 @@ import com.ensias.eldycare.mobile.smartphone.composables.main.relative.dialogs.A
 import com.ensias.eldycare.mobile.smartphone.data.Connection
 import com.ensias.eldycare.mobile.smartphone.service.ConnectionService
 import com.ensias.eldycare.mobile.smartphone.service.NotificationService
+import com.ensias.eldycare.mobile.smartphone.service.ReminderService
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -58,17 +59,17 @@ fun RelativeHomePage(navController: NavController, context: Context) {
     ) // request notification permission
 
 
-
-
     // Start the notification service
-    val serviceIntent = Intent(context, NotificationService::class.java)
-    val connectionArrayList = ArrayList<String>()
-    connectionList.forEach {
-        connectionArrayList.add(it.email)
-    }
-    serviceIntent.putStringArrayListExtra("connection-list", connectionArrayList)
-    serviceIntent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
-    context.startService(serviceIntent)
+    LaunchedEffect(key1 = null, block = {// similar to react, execute once
+        val serviceIntent = Intent(context, NotificationService::class.java)
+        val connectionArrayList = ArrayList<String>()
+        connectionList.forEach {
+            connectionArrayList.add(it.email)
+        }
+        serviceIntent.putStringArrayListExtra("connection-list", connectionArrayList)
+        serviceIntent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+        context.startService(serviceIntent)
+    })
 
 
     LaunchedEffect(Unit){
