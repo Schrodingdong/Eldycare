@@ -2,7 +2,8 @@ package com.ensias.eldycare.mobile.smartphone.data
 
 import java.util.Date
 
+@Deprecated("Use Alert from data.database")
 data class Alert(
-    var time: Date,
-    var message: String?
+    var alertTime: Date,
+    var alertMessage: String?
 )

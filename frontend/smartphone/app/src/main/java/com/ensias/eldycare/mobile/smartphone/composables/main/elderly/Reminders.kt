@@ -32,29 +32,14 @@ import java.util.Date
 import java.util.Locale
 
 @Composable
-fun RemindersSectionComposable(innerPadding: PaddingValues, remindersList: List<Reminder>? = null){
-    val remindersMockList= listOf(
-        Reminder(Date.from(Instant.now()), "Reminder 1"),
-        Reminder(Date.from(Instant.now()), "Reminder 2"),
-        Reminder(Date.from(Instant.now()), "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec euismod, nisl eget ultricies ultrices, nunc nisl aliquam nunc, quis aliquam nisl nunc eu nisl. Donec euismod, nisl eget "),
-        Reminder(Date.from(Instant.now()), "Reminder 4"),
-        Reminder(Date.from(Instant.now()), "Reminder 5"),
-        Reminder(Date.from(Instant.now()), "Reminder 6"),
-        Reminder(Date.from(Instant.now()), "Reminder 7"),
-        Reminder(Date.from(Instant.now()), "Reminder 8"),
-        Reminder(Date.from(Instant.now()), "Reminder 9"),
-        Reminder(Date.from(Instant.now()), "Reminder 10"),
-        Reminder(Date.from(Instant.now()), "Reminder 11"),
-    )
+fun RemindersSectionComposable(innerPadding: PaddingValues, remindersList: List<Reminder> = emptyList()){
     Column(
         modifier = Modifier
             .padding(innerPadding)
             .fillMaxSize()
     ){
         SectionTitle(text = "My\nReminders")
-        RemindersList(
-            reminders = if (remindersList.isNullOrEmpty()) emptyList() else remindersList
-        )
+        RemindersList(remindersList)
     }
 
 }

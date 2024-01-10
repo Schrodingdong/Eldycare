@@ -24,13 +24,17 @@ import com.ensias.eldycare.mobile.smartphone.composables.auth.login.LoginPage
 import com.ensias.eldycare.mobile.smartphone.composables.auth.signup.SignupPage
 import com.ensias.eldycare.mobile.smartphone.composables.main.elderly.ElderHomePage
 import com.ensias.eldycare.mobile.smartphone.composables.main.relative.RelativeHomePage
+import com.ensias.eldycare.mobile.smartphone.data.database.AlertDatabase
 import com.ensias.eldycare.mobile.smartphone.theme.ComposeTestTheme
 
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // init variables
         val context: Context = this
+        // init database
+        AlertDatabase.init(context)
         setContent {
             ComposeTestTheme {
                 val navController = rememberNavController()

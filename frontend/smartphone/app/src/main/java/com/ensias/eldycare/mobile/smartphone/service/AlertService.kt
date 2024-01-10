@@ -3,22 +3,32 @@ package com.ensias.eldycare.mobile.smartphone.service
 import android.util.Log
 import com.ensias.eldycare.mobile.smartphone.api.ApiClient
 import com.ensias.eldycare.mobile.smartphone.data.AlertType
+import com.ensias.eldycare.mobile.smartphone.data.database.Alert
+import com.ensias.eldycare.mobile.smartphone.data.database.AlertDatabase
 import com.ensias.eldycare.mobile.smartphone.data.model.NotificationModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.time.Instant
 
-class AlertService {
+class AlertService() {
 
     /**
      * Send an alert to the server
      * @param alertType : the type of the alert
      */
     fun sendAlert(alertType: List<AlertType>) {
+        val alertTypeString = alertType.joinToString(separator = ";")
+        val alert = Alert(
+            elderEmail = ApiClient.email,
+            alertMessage = generateAlertMessage(alertType),
+            alertType = alertTypeString,
+            alertTime = Instant.now().toString(),
+            location = "here" // TODO : get the location
+        )
         GlobalScope.launch{
             // TODO : save the notification locally / cloud
-
+            AlertDatabase.getDbInstance().alertDao.upsertAlert(alert)
 
             // send it
             val notif = NotificationModel(

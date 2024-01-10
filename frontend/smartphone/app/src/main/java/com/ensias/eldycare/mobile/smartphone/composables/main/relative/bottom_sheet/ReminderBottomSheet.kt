@@ -1,9 +1,7 @@
 package com.ensias.eldycare.mobile.smartphone.composables.main.relative.bottom_sheet
 
 import android.os.Build
-import android.os.Looper
 import android.util.Log
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -44,7 +42,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import okhttp3.Response
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.LocalTime
@@ -255,7 +252,7 @@ fun BottomSheetConnectionInfo(connection: Connection){
         Spacer(modifier = Modifier.height(16.dp))
         if(connection.lastAlert != null){
             Text(
-                text = "Last Alert: ${SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH).format(connection.lastAlert?.time!!)}",
+                text = "Last Alert: ${SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH).format(connection.lastAlert?.alertTime!!)}",
                 fontWeight = FontWeight.Light,
                 fontSize = MaterialTheme.typography.bodySmall.fontSize
             )

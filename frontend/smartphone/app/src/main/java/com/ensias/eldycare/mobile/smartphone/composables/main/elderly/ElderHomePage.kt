@@ -3,9 +3,6 @@ package com.ensias.eldycare.mobile.smartphone.composables.main.elderly
 import android.content.Context
 import android.content.Intent
 import android.provider.Settings
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
@@ -33,9 +30,9 @@ import com.ensias.eldycare.mobile.smartphone.MainActivity
 import com.ensias.eldycare.mobile.smartphone.composables.Screen
 import com.ensias.eldycare.mobile.smartphone.composables.main.TopAppBarEldycare
 import com.ensias.eldycare.mobile.smartphone.data.Reminder
+import com.ensias.eldycare.mobile.smartphone.data.database.Alert
 import com.ensias.eldycare.mobile.smartphone.data.model.ReminderCalendarEventModel
 import com.ensias.eldycare.mobile.smartphone.service.AlertService
-import com.ensias.eldycare.mobile.smartphone.service.NotificationService
 import com.ensias.eldycare.mobile.smartphone.service.ReminderService
 import com.ensias.eldycare.mobile.smartphone.service.content_provider.CalendarProvider
 import java.time.Instant
@@ -55,6 +52,7 @@ fun ElderHomePage(navController: NavController, context: Context){
     )
     var section by remember { mutableStateOf(Section.REMINDERS) }
     var reminderList by remember { mutableStateOf(listOf<Reminder>()) }
+    var alertList by remember { mutableStateOf(listOf<Alert>()) }
 
     // Start the reminders service
     LaunchedEffect(key1 = null, block = {
@@ -65,8 +63,8 @@ fun ElderHomePage(navController: NavController, context: Context){
 
     LaunchedEffect(Unit){
         // TODO ACTIVATE THE MOCKS
-//        AlertService().mockSendAlert()
-        // Read from calendar
+        AlertService().mockSendAlert()
+        // Read reminders from calendar
         ActivityCompat.requestPermissions(
             context as MainActivity,
             arrayOf(
@@ -85,6 +83,8 @@ fun ElderHomePage(navController: NavController, context: Context){
             )
             reminderList = reminderList + reminderEl
         }
+
+        // TODO : read alerts from DB
     }
 
     Scaffold(
@@ -126,19 +126,30 @@ fun ElderHomePage(navController: NavController, context: Context){
         if(section == Section.REMINDERS){
             RemindersSectionComposable(innerPadding = innerPadding, remindersList = reminderList)
         } else if(section == Section.ALERTS){
-            AlertSectionComposable(innerPadding = innerPadding)
+            AlertSectionComposable(innerPadding = innerPadding, alertsList = alertList)
         }
     }
 }
 
 @Preview
 @Composable
-fun ElderHomePagePreview(){
+fun ElderHomePagePreviewReminders(){
     Scaffold(
         topBar = {
             TopAppBarEldycare()
         },
     ){ innerPadding ->
         RemindersSectionComposable(innerPadding = innerPadding)
+    }
+}
+@Preview
+@Composable
+fun ElderHomePagePreviewAlerts(){
+    Scaffold(
+        topBar = {
+            TopAppBarEldycare()
+        },
+    ){ innerPadding ->
+        AlertSectionComposable(innerPadding = innerPadding)
     }
 }
