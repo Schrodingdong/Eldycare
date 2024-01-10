@@ -1,6 +1,7 @@
 package com.ensias.eldycare.mobile.smartphone.data.database
 
 import android.content.Context
+import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -9,6 +10,7 @@ import com.ensias.eldycare.mobile.smartphone.data.dao.AlertDao
 @Database(
     entities = [Alert::class],
     version = 1,
+    exportSchema = false
 )
 abstract class AlertDatabase : RoomDatabase() {
     abstract val alertDao: AlertDao

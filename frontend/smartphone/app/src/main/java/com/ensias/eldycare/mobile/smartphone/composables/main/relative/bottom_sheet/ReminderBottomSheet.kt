@@ -252,7 +252,7 @@ fun BottomSheetConnectionInfo(connection: Connection){
         Spacer(modifier = Modifier.height(16.dp))
         if(connection.lastAlert != null){
             Text(
-                text = "Last Alert: ${SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH).format(connection.lastAlert?.alertTime!!)}",
+                text = "Last Alert: ${connection.lastAlert?.alertDate} - ${connection.lastAlert?.alertTime}",
                 fontWeight = FontWeight.Light,
                 fontSize = MaterialTheme.typography.bodySmall.fontSize
             )

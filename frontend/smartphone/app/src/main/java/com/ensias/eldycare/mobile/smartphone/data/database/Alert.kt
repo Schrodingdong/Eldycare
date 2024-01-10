@@ -11,5 +11,6 @@ data class Alert(
     val alertMessage: String,
     val alertType: String, // semi-colon separated list of alert types
     val alertTime: String,
+    val alertDate: String,
     val location: String
 )

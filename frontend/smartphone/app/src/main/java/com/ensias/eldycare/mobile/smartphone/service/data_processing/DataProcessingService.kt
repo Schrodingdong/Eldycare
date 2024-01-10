@@ -21,7 +21,7 @@ class DataProcessingService {
             alertType.add(AlertType.CARDIAC);
         }
         if (alertType.isNotEmpty()) {
-            AlertService().sendAlert(alertType);
+//            AlertService().sendAlert(alertType);
         }
     }
 

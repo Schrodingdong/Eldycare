@@ -84,8 +84,8 @@ fun AlertsList(alerts: List<Alert> = emptyList()) {
 
 @Composable
 fun AlertItem(alert: Alert) {
-    val dateText = SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH).format(alert.alertTime)
-    val timeText = "At " + SimpleDateFormat("HH:mm", Locale.FRENCH).format(alert.alertTime)
+    val dateText = alert.alertDate
+    val timeText = alert.alertTime
     Card(
         modifier = Modifier
             .fillMaxWidth()

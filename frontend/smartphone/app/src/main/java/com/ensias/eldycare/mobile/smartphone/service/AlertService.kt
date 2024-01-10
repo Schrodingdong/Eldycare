@@ -10,8 +10,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.time.Instant
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
-class AlertService() {
+class AlertService(val onAlertListChange: (List<Alert>) -> Unit) {
 
     /**
      * Send an alert to the server
@@ -23,12 +26,23 @@ class AlertService() {
             elderEmail = ApiClient.email,
             alertMessage = generateAlertMessage(alertType),
             alertType = alertTypeString,
-            alertTime = Instant.now().toString(),
+            alertTime = DateTimeFormatter.ofPattern("HH:mm").format(LocalTime.now()),
+            alertDate = DateTimeFormatter.ISO_LOCAL_DATE.format(LocalDate.now()),
             location = "here" // TODO : get the location
         )
         GlobalScope.launch{
-            // TODO : save the notification locally / cloud
+            // save it Localy
             AlertDatabase.getDbInstance().alertDao.upsertAlert(alert)
+
+            // get the new list
+            val alertList = AlertDatabase.getDbInstance().alertDao.getAlertsByElderEmail(
+                elderEmail = ApiClient.email,
+                limit = 10
+            ) // wont be a performance issue since the list is small && not many alerts are sent
+
+            // refresh composition
+            onAlertListChange(alertList)
+
 
             // send it
             val notif = NotificationModel(

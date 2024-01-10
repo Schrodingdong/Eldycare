@@ -44,6 +44,7 @@ enum class Section {
     ALERTS
 }
 
+
 @Composable
 fun ElderHomePage(navController: NavController, context: Context){
     val items = listOf(
@@ -53,6 +54,7 @@ fun ElderHomePage(navController: NavController, context: Context){
     var section by remember { mutableStateOf(Section.REMINDERS) }
     var reminderList by remember { mutableStateOf(listOf<Reminder>()) }
     var alertList by remember { mutableStateOf(listOf<Alert>()) }
+    val alertService = AlertService(onAlertListChange = {alertList = it})
 
     // Start the reminders service
     LaunchedEffect(key1 = null, block = {
@@ -63,7 +65,8 @@ fun ElderHomePage(navController: NavController, context: Context){
 
     LaunchedEffect(Unit){
         // TODO ACTIVATE THE MOCKS
-        AlertService().mockSendAlert()
+        alertService.mockSendAlert()
+
         // Read reminders from calendar
         ActivityCompat.requestPermissions(
             context as MainActivity,
@@ -83,8 +86,6 @@ fun ElderHomePage(navController: NavController, context: Context){
             )
             reminderList = reminderList + reminderEl
         }
-
-        // TODO : read alerts from DB
     }
 
     Scaffold(
