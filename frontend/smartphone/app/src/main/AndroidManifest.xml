@@ -24,6 +24,10 @@
             android:foregroundServiceType="mediaProjection"
             android:exported="false">
         </service>
+        <service
+            android:name=".service.ReminderService"
+            android:exported="false">
+        </service>
         <activity
             android:name=".MainActivity"
             android:exported="true"

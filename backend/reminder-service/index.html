@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STOMP WebSocket Client with SockJS</title>
+    <style>
+      /* Modern minimalistic styling */
+      body {
+          font-family: sans-serif;
+          margin: 40px auto;
+          max-width: 600px;
+          color: #333;
+          text-align: left;
+      }
+
+      h1 {
+          font-size: 24px;
+          margin-bottom: 20px;
+          text-align: center;
+      }
+
+      label, input, button {
+          display: block;
+          margin-bottom: 10px;
+      }
+
+      input, button {
+          width: 100%;
+          padding: 10px;
+          border: 1px solid #ccc;
+          border-radius: 5px;
+          box-sizing: border-box;
+          font-size: 16px;
+      }
+
+      button {
+          background-color: #007bff;
+          color: white;
+          cursor: pointer;
+      }
+
+      #messages {
+          margin-top: 20px;
+          border: 1px solid #ccc;
+          border-radius: 5px;
+          padding: 20px;
+      }
+
+      #messages p {
+          margin-bottom: 10px;
+      }
+
+      #sendButton {
+            background-color: #ff00da;
+            color: white;
+            cursor: pointer;
+      }
+  </style>
+</head>
+<body>
+    <h1>STOMP WebSocket Client with SockJS</h1>
+    <button onclick="connect()">Connect</button>
+    <br/>
+    <label for="emailInput">Enter Email:</label>
+    <input type="text" id="emailInput" placeholder="Enter your email">
+    <button onclick="subscribe()">Subscribe</button>
+    <label for="messageInput">send message:</label>
+    <input type="text" id="messageInput" placeholder="Enter your message">
+    <button onclick="sendMessage()" id="sendButton">Send</button>
+
+
+    <div id="messages"></div>
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.2/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script>
+        "use strict";
+        const serverUri = "ws://localhost:8083/reminders-ws";
+        const topic = "/topic/reminder/";
+
+        let stompClient;
+        let email = "";
+
+        function connect() {
+            const socket = new WebSocket(serverUri);
+            stompClient = Stomp.over(socket);
+            stompClient.connect({
+                    "Authorization": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJvdXNzYW1hQGdtYWlsLmNvbSIsImV4cCI6MTcwNDY0MjQ0NywiaWF0IjoxNzA0NjI0NDQ3fQ.wizf7nRuQ80kS6bGvNF-on_uumDoip5szcLluERbj89cNDPl-MakFJIKRHl2Nq1IJ1ImOEYjkaZn1B1MvYrIzg"
+                }, onConnect, onError);
+        }
+
+        function onConnect() {
+            console.log("Connected to WebSocket");
+        }
+
+        function onError(error) {
+            console.error("Error during WebSocket connection:", error);
+        }
+
+        function subscribe() {
+            email = document.getElementById("emailInput").value;
+            const subscription = stompClient.subscribe(topic + email, onMessageReceived);
+            console.log("Subscribed to:", subscription);
+        }
+
+        function onMessageReceived(message) {
+            console.log(message);
+            const messagesDiv = document.getElementById("messages");
+            const messageContent = message.body;
+            messagesDiv.innerHTML += `<p>New Notification for ${email}: ${messageContent}</p>`;
+        }
+
+        function sendMessage() {
+            const messageInput = document.getElementById("messageInput");
+            const message = messageInput.value;
+            stompClient.send(topic + email, {}, JSON.stringify({message, email}));
+        }
+
+
+        // connect();
+    </script>
+</body>
+</html>

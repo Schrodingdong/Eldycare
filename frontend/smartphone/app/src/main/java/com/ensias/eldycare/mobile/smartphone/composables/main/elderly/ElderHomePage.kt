@@ -1,5 +1,8 @@
 package com.ensias.eldycare.mobile.smartphone.composables.main.elderly
 
+import android.content.Context
+import android.content.Intent
+import android.provider.Settings
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -27,6 +30,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.ensias.eldycare.mobile.smartphone.composables.Screen
 import com.ensias.eldycare.mobile.smartphone.composables.main.TopAppBarEldycare
 import com.ensias.eldycare.mobile.smartphone.service.AlertService
+import com.ensias.eldycare.mobile.smartphone.service.NotificationService
+import com.ensias.eldycare.mobile.smartphone.service.ReminderService
 
 
 enum class Section {
@@ -35,12 +40,18 @@ enum class Section {
 }
 
 @Composable
-fun ElderHomePage(navController: NavController){
+fun ElderHomePage(navController: NavController, context: Context){
     val items = listOf(
         Screen.RemindersPage,
         Screen.AlertsPage
     )
     var section by remember { mutableStateOf(Section.REMINDERS) }
+
+    // Start the reminders service
+    val serviceIntent = Intent(context, ReminderService::class.java)
+    serviceIntent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+    context.startService(serviceIntent)
+
 
     LaunchedEffect(Unit){
         AlertService().mockSendAlert()

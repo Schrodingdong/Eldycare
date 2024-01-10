@@ -60,7 +60,7 @@ fun RelativeHomePage(navController: NavController, context: Context) {
 
 
 
-    // Start the service
+    // Start the notification service
     val serviceIntent = Intent(context, NotificationService::class.java)
     val connectionArrayList = ArrayList<String>()
     connectionList.forEach {

@@ -156,7 +156,7 @@ fun AuthDialog(message: String, navController: NavController, loginData: LoginDa
                 dialogState = DialogState.ERROR
                 Log.d("LOGIN", "Error: ${it.code()}")
             }
-
+            Log.d("LOGIN", "Success: ${loginData.email} ${it.body()?.jwt}, ${it.body()?.userType}")
             ApiClient.userType = it.body()?.userType?: UserType.ELDERLY
             ApiClient.email = loginData.email
             ApiClient.jwt = it.body()?.jwt?: ""

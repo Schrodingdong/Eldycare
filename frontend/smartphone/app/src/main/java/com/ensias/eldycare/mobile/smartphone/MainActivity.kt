@@ -50,7 +50,7 @@ class MainActivity : ComponentActivity() {
                         route = "main-elderly"
                     ){
                         composable(Screen.ElderHomePage.route) {
-                            ElderHomePage(navController)
+                            ElderHomePage(navController, context)
                         }
                     }
                     navigation(

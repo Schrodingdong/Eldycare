@@ -16,14 +16,12 @@ public class WebSocketReminderSender {
     private transient final Logger logger = LoggerFactory.getLogger(WebSocketReminderSender.class);
 
     public void sendReminder(String relativeEmail, String elderEmail, String message) {
-        // Send the message to the relative's reminder queue
+        // Send the message to the elder's reminder queue
         String destination = "/topic/reminder/" + elderEmail;
         logger.info("\n>>> Sending to : destination: {}", destination);
         try{
             // Include relative's email in the message payload
-            String fullMessage = relativeEmail + ": " + message;
-            byte[] byteMessage = fullMessage.getBytes();
-
+            byte[] byteMessage = message.getBytes();
             messagingTemplate.convertAndSend(destination, byteMessage);
             logger.info("\n>>> Message sent to elder: {}", elderEmail);
         } catch (Exception e) {

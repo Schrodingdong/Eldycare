@@ -6,6 +6,7 @@ import com.eldycare.reminder.dto.ReminderDto;
 import com.eldycare.reminder.mapper.ReminderMapper;
 import com.eldycare.reminder.repository.ReminderRepository;
 import com.eldycare.reminder.service.service.ReminderService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.AmqpTemplate;
@@ -23,6 +24,8 @@ public class ReminderServiceImpl implements ReminderService {
 
     @Autowired
     private WebSocketReminderSender webSocketReminderSender;
+    @Autowired
+    private ObjectMapper objectMapper;
 
 
     @Value("${amqp.queue}")
@@ -55,10 +58,22 @@ public class ReminderServiceImpl implements ReminderService {
 //        }
 
         // Send a WebSocket message to the elder
-        webSocketReminderSender.sendReminder(
-                reminder.getRelativeEmail(),
+        ReminderDto reminderDto = new ReminderDto(
                 reminder.getElderEmail(),
+                reminder.getRelativeEmail(),
+                reminder.getReminderDate(),
+                reminder.getReminderTime(),
                 reminder.getDescription()
         );
+        logger.info("sendReminderToRelative - reminderDto: {}", reminderDto);
+        try{
+            webSocketReminderSender.sendReminder(
+                    reminder.getRelativeEmail(),
+                    reminder.getElderEmail(),
+                    objectMapper.writeValueAsString(reminderDto)
+            );
+        } catch (Exception e) {
+            logger.error("sendReminderToRelative - error: {}", e.getMessage());
+        }
     }
 }

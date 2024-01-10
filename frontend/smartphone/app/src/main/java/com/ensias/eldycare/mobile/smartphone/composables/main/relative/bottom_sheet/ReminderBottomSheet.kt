@@ -216,10 +216,8 @@ fun BottomSheetAddReminder(
                     }
                     if(counter == THRESHOLD && !res.isSuccessful){
                         Log.d("BottomSheetContent", "is succesfull : " +  res.isSuccessful)
-                        Toast.makeText(context, "Reminder not added", Toast.LENGTH_SHORT).show()
                     } else {
                         Log.d("BottomSheetContent", "is succesfull : " +  res.isSuccessful)
-                        Toast.makeText(context, "Reminder added", Toast.LENGTH_SHORT).show()
                     }
                 }
             }) {
