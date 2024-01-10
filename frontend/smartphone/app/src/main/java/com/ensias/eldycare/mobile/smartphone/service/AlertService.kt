@@ -19,6 +19,7 @@ class AlertService {
         GlobalScope.launch{
             // TODO : save the notification locally / cloud
 
+
             // send it
             val notif = NotificationModel(
                 elderEmail= ApiClient.email,
