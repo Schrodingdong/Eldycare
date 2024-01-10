@@ -1,8 +1,10 @@
 package com.ensias.eldycare.mobile.smartphone.data
 
-import java.util.Date
+import java.time.LocalDate
+import java.time.LocalTime
 
 data class Reminder(
-    var time: Date,
+    var reminderDate: LocalDate,
+    var reminderTime: LocalTime,
     var description: String
 )

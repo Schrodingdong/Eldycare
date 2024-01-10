@@ -3,23 +3,40 @@ package com.ensias.eldycare.mobile.smartphone.composables.main.elderly
 import android.content.Context
 import android.content.Intent
 import android.provider.Settings
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
@@ -27,16 +44,25 @@ import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.ensias.eldycare.mobile.smartphone.MainActivity
+import com.ensias.eldycare.mobile.smartphone.api.ApiClient
 import com.ensias.eldycare.mobile.smartphone.composables.Screen
 import com.ensias.eldycare.mobile.smartphone.composables.main.TopAppBarEldycare
+import com.ensias.eldycare.mobile.smartphone.composables.main.relative.dialogs.MyDatePickerDialog
+import com.ensias.eldycare.mobile.smartphone.composables.main.relative.dialogs.MyTimePickerDialog
 import com.ensias.eldycare.mobile.smartphone.data.Reminder
 import com.ensias.eldycare.mobile.smartphone.data.database.Alert
+import com.ensias.eldycare.mobile.smartphone.data.database.AlertDatabase
 import com.ensias.eldycare.mobile.smartphone.data.model.ReminderCalendarEventModel
+import com.ensias.eldycare.mobile.smartphone.data.model.ReminderModel
 import com.ensias.eldycare.mobile.smartphone.service.AlertService
 import com.ensias.eldycare.mobile.smartphone.service.ReminderService
 import com.ensias.eldycare.mobile.smartphone.service.content_provider.CalendarProvider
-import java.time.Instant
-import java.util.Date
+import com.vanpra.composematerialdialogs.MaterialDialogState
+import com.vanpra.composematerialdialogs.rememberMaterialDialogState
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 
 
 enum class Section {
@@ -56,9 +82,40 @@ fun ElderHomePage(navController: NavController, context: Context){
     var alertList by remember { mutableStateOf(listOf<Alert>()) }
     val alertService = AlertService(onAlertListChange = {alertList = it})
 
+    // reminder variables
+    var showAddReminderPopup by remember { mutableStateOf(false) }
+    val dateDialogState = rememberMaterialDialogState()
+    val timeDialogState = rememberMaterialDialogState()
+    var reminder by remember {
+        mutableStateOf(ReminderModel(
+            reminderDate = LocalDate.now(),
+            reminderTime = LocalTime.now(),
+            description = "",
+            elderEmail = ApiClient.email,
+            relativeEmail = "")
+        )
+    }
+    val formattedDate by remember{
+        derivedStateOf{
+            DateTimeFormatter
+                .ISO_LOCAL_DATE
+                .format(reminder.reminderDate)
+        }
+    }
+    val formattedTime by remember{
+        derivedStateOf{
+            DateTimeFormatter
+                .ofPattern("HH:mm")
+                .format(reminder.reminderTime)
+        }
+    }
+
+
     // Start the reminders service
     LaunchedEffect(key1 = null, block = {
+        ReminderService.onReminderListChange = {reminderList = it}
         val serviceIntent = Intent(context, ReminderService::class.java)
+        // put variable for the service
         serviceIntent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
         context.startService(serviceIntent)
     })
@@ -67,7 +124,7 @@ fun ElderHomePage(navController: NavController, context: Context){
         // TODO ACTIVATE THE MOCKS
         alertService.mockSendAlert()
 
-        // Read reminders from calendar
+        // request permissions
         ActivityCompat.requestPermissions(
             context as MainActivity,
             arrayOf(
@@ -76,16 +133,22 @@ fun ElderHomePage(navController: NavController, context: Context){
             ),
             101
         )
-        CalendarProvider(context).readFromCalendar().forEach{
-            val reminderEl = Reminder(
-                time = Date.from(Instant.ofEpochMilli(it.dtstart)),
-                description = it.title.subSequence(
-                    startIndex = ReminderCalendarEventModel.TITLE_PREFIX.length,
-                    endIndex = it.title.length
-                ).toString()
-            )
-            reminderList = reminderList + reminderEl
-        }
+
+        // Read reminders from calendar
+        ReminderService.recomposeReminderList(context)
+//        CalendarProvider(context).readFromCalendar().forEach{
+//            val reminderTime = Instant.ofEpochMilli(it.dtstart).atZone(ZoneOffset.UTC).toLocalTime()
+//            val reminderDate = Instant.ofEpochMilli(it.dtstart).atZone(ZoneOffset.UTC).toLocalDate()
+//            val reminderEl = Reminder(
+//                reminderTime = reminderTime,
+//                reminderDate = reminderDate,
+//                description = it.title.subSequence(
+//                    startIndex = ReminderCalendarEventModel.TITLE_PREFIX.length,
+//                    endIndex = it.title.length
+//                ).toString()
+//            )
+//            reminderList = reminderList + reminderEl
+//        }
     }
 
     Scaffold(
@@ -122,6 +185,14 @@ fun ElderHomePage(navController: NavController, context: Context){
                     )
                 }
             }
+        },
+        floatingActionButton = {
+            if(section == Section.REMINDERS)
+                FloatingActionButton(onClick = {
+                    showAddReminderPopup = true
+                }) {
+                    Icon(Icons.Outlined.Add, contentDescription = null, tint = Color.White)
+                }
         }
     ){ innerPadding ->
         if(section == Section.REMINDERS){
@@ -130,6 +201,156 @@ fun ElderHomePage(navController: NavController, context: Context){
             AlertSectionComposable(innerPadding = innerPadding, alertsList = alertList)
         }
     }
+    if (showAddReminderPopup) {
+        AddReminderPopup(
+            onDismiss = { showAddReminderPopup = false },
+
+            reminderModel = reminder,
+            onReminderChange = { reminder = it },
+            formattedDate = formattedDate,
+            formattedTime = formattedTime,
+            dateDialogState = dateDialogState,
+            showDateDialog = { showDateDialog ->
+                if (showDateDialog) {
+                    dateDialogState.show()
+                } else {
+                    dateDialogState.hide()
+                }
+            },
+            timeDialogState = timeDialogState,
+            showTimeDialog = { showTimeDialog ->
+                if (showTimeDialog) {
+                    timeDialogState.show()
+                } else {
+                    timeDialogState.hide()
+                }
+            },
+            onAddReminder = { reminder ->
+                // save locally to calendar
+                val reminderCalendarEvent = ReminderCalendarEventModel(
+                    title = "${ReminderCalendarEventModel.TITLE_PREFIX}${reminder.description}",
+                    dtstart = reminder.reminderDate.atTime(reminder.reminderTime).toInstant(ZoneOffset.UTC).toEpochMilli(),
+                    dtend = reminder.reminderDate.atTime(reminder.reminderTime).toInstant(ZoneOffset.UTC).toEpochMilli(),
+                    description = reminder.description,
+                    calendarId = 1,
+                    eventTimezone = "UTC",
+                    eventLocation = "ELDYCARE"
+                )
+                CalendarProvider(context).writeToCalendar(reminderCalendarEvent)
+
+                // recomposition
+                ReminderService.recomposeReminderList(context)
+            }
+        )
+    }
+}
+
+@Composable
+fun AddReminderPopup(
+    onDismiss: () -> Unit,
+    reminderModel: ReminderModel,
+    onAddReminder: (Reminder) -> Unit,
+    onReminderChange: (ReminderModel) -> Unit,
+    formattedDate: String,
+    formattedTime: String,
+    dateDialogState: MaterialDialogState,
+    showDateDialog: (Boolean) -> Unit,
+    timeDialogState: MaterialDialogState,
+    showTimeDialog: (Boolean) -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Add Reminder" ) },
+        text = {
+            // ========================================================================================
+            Column {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Button(onClick = {
+//                showDatePickerDialog()
+                        showDateDialog(true)
+                    }) {
+                        androidx.compose.material.Text(text = "Date", color = MaterialTheme.colorScheme.onPrimary)
+                    }
+                    androidx.compose.material.Text(
+                        text = formattedDate,
+                        fontWeight = FontWeight.Light,
+//                fontSize = MaterialTheme.typography.bodySmall.fontSize
+                    )
+                }
+                // ========================================================================================
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Button(onClick = {
+                        showTimeDialog(true)
+                    }) {
+                        androidx.compose.material.Text(text = "Time", color = MaterialTheme.colorScheme.onPrimary)
+                    }
+                    androidx.compose.material.Text(
+                        text = formattedTime,
+                        fontWeight = FontWeight.Light,
+//                fontSize = MaterialTheme.typography.bodySmall.fontSize
+                    )
+                }
+                // ========================================================================================
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(150.dp),
+                    value = reminderModel.description,
+                    onValueChange = { onReminderChange(reminderModel.copy(description = it))},
+                    label = { androidx.compose.material.Text(text = "Description") },
+                )
+
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    val reminder = Reminder(
+                        reminderTime = reminderModel.reminderTime,
+                        reminderDate = reminderModel.reminderDate,
+                        description = reminderModel.description
+                    )
+                    onAddReminder(reminder)
+                    onDismiss()
+                }
+            ) {
+                Text("Add")
+            }
+        },
+        dismissButton = {
+            Button(
+                onClick = onDismiss,
+
+            ) {
+                Text("Cancel")
+            }
+        }
+    )
+    MyDatePickerDialog(
+        dateDialogState = dateDialogState,
+        onReminderChange = onReminderChange,
+        showDateDialog = showDateDialog,
+        showTimeDialog = showTimeDialog,
+        reminder = reminderModel
+    )
+    MyTimePickerDialog(
+        timeDialogState = timeDialogState,
+        onReminderChange = onReminderChange,
+        showTimeDialog = showTimeDialog,
+        reminder = reminderModel
+    )
 }
 
 @Preview

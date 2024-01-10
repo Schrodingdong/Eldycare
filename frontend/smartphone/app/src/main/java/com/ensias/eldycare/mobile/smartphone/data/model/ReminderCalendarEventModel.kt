@@ -1,7 +1,9 @@
 package com.ensias.eldycare.mobile.smartphone.data.model
 
+import kotlin.random.Random
+
 data class ReminderCalendarEventModel(
-    val id: Long,
+    val id: Long = Random(System.currentTimeMillis()).nextLong(),
     val title: String, // Should start with titlePrefix
     val description: String,
     val dtstart: Long,

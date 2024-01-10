@@ -22,7 +22,6 @@ class CalendarProvider(val context: Context) {
     }
     fun readFromCalendar() : List<ReminderCalendarEventModel>{
         val eldycareReminders = mutableListOf<ReminderCalendarEventModel>()
-
         val projection = arrayOf(
             CalendarContract.Events._ID,
             CalendarContract.Events.TITLE,
@@ -33,10 +32,10 @@ class CalendarProvider(val context: Context) {
             CalendarContract.Events.CALENDAR_ID,
             CalendarContract.Events.EVENT_TIMEZONE,
         )
-        // select titles that contains TITLE_PREFIX and future events and not deleted
+        // select 10 or less Recent titles that contains TITLE_PREFIX and future events and not deleted
         val selectionClause = "${CalendarContract.Events.TITLE} LIKE ? AND ${CalendarContract.Events.DTSTART} > ? AND ${CalendarContract.Events.DELETED} = 0"
         val selectionArgs = arrayOf("%${ReminderCalendarEventModel.TITLE_PREFIX}%", System.currentTimeMillis().toString())
-        val sortOrder = "${CalendarContract.Events.DTSTART} ASC"
+        val sortOrder = "${CalendarContract.Events.DTSTART} ASC LIMIT 10"
         context.contentResolver.query(
             CalendarContract.Events.CONTENT_URI,
             projection,

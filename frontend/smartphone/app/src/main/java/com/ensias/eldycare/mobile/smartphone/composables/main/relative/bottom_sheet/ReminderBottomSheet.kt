@@ -120,8 +120,6 @@ fun BottomSheetAddReminder(
     timeDialogState: MaterialDialogState,
     showTimeDialog: (Boolean) -> Unit,
 ) {
-    var description by remember { mutableStateOf("") }
-    val context = LocalContext.current
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -132,8 +130,8 @@ fun BottomSheetAddReminder(
             fontWeight = FontWeight.Bold,
             fontSize = MaterialTheme.typography.headlineLarge.fontSize
         )
-        Spacer(modifier = Modifier.height(16.dp))
         // ========================================================================================
+        Spacer(modifier = Modifier.height(16.dp))
         Row(
             modifier = Modifier
                 .fillMaxWidth(),

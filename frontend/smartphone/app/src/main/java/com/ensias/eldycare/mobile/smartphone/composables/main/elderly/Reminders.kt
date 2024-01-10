@@ -1,6 +1,5 @@
 package com.ensias.eldycare.mobile.smartphone.composables.main.elderly
 
-import android.content.res.Resources.Theme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -10,10 +9,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Colors
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.runtime.Composable
@@ -22,13 +19,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ensias.eldycare.mobile.smartphone.R
 import com.ensias.eldycare.mobile.smartphone.data.Reminder
 import java.text.SimpleDateFormat
-import java.time.Instant
-import java.util.Date
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 @Composable
@@ -106,8 +102,8 @@ fun RemindersList(reminders: List<Reminder> = emptyList()) {
 
 @Composable
 fun ReminderItem(reminder: Reminder) {
-    val dateText = SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH).format(reminder.time)
-    val timeText = "At " + SimpleDateFormat("HH:mm", Locale.FRENCH).format(reminder.time)
+    val dateText = DateTimeFormatter.ISO_LOCAL_DATE.format(reminder.reminderDate)
+    val timeText = DateTimeFormatter.ofPattern("HH:mm").format(reminder.reminderTime)
     OutlinedCard (
         modifier = Modifier
             .fillMaxWidth()
@@ -123,6 +119,7 @@ fun ReminderItem(reminder: Reminder) {
                 Text(text = timeText, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             Text(text = reminder.description )
+            // TODO if there is a localisation or other tha ELDYCARE case insensitive
         }
     }
 }
