@@ -24,14 +24,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.ensias.eldycare.mobile.smartphone.MainActivity
 import com.ensias.eldycare.mobile.smartphone.composables.Screen
 import com.ensias.eldycare.mobile.smartphone.composables.main.TopAppBarEldycare
 import com.ensias.eldycare.mobile.smartphone.service.AlertService
 import com.ensias.eldycare.mobile.smartphone.service.NotificationService
 import com.ensias.eldycare.mobile.smartphone.service.ReminderService
+import com.ensias.eldycare.mobile.smartphone.service.content_provider.CalendarProvider
 
 
 enum class Section {
@@ -54,7 +57,17 @@ fun ElderHomePage(navController: NavController, context: Context){
 
 
     LaunchedEffect(Unit){
-        AlertService().mockSendAlert()
+        // TODO ACTIVATE THE MOCKS
+//        AlertService().mockSendAlert()
+        ActivityCompat.requestPermissions(
+            context as MainActivity,
+            arrayOf(
+                android.Manifest.permission.READ_CALENDAR,
+                android.Manifest.permission.WRITE_CALENDAR,
+            ),
+            101
+        )
+        CalendarProvider(context).readFromCalendar()
     }
 
     Scaffold(
