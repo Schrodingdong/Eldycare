@@ -26,7 +26,7 @@ class AlertService(val onAlertListChange: (List<Alert>) -> Unit) {
             elderEmail = ApiClient.email,
             alertMessage = generateAlertMessage(alertType),
             alertType = alertTypeString,
-            alertTime = DateTimeFormatter.ofPattern("HH:mm").format(LocalTime.now()),
+            alertTime = DateTimeFormatter.ofPattern("HH:mm:ss").format(LocalTime.now()),
             alertDate = DateTimeFormatter.ISO_LOCAL_DATE.format(LocalDate.now()),
             location = "here" // TODO : get the location
         )
