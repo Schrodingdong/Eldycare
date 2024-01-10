@@ -1,5 +1,7 @@
 package com.ensias.eldycare.mobile.smartphone
 
+import android.app.Fragment
+import android.app.FragmentManager
 import android.content.Context
 import android.os.Build
 import android.os.Bundle

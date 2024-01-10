@@ -9,24 +9,13 @@ import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
@@ -42,6 +31,7 @@ import androidx.navigation.NavController
 import com.ensias.eldycare.mobile.smartphone.api.ApiClient
 import com.ensias.eldycare.mobile.smartphone.api.websocket.NotificationWebsocketClient
 import com.ensias.eldycare.mobile.smartphone.composables.main.TopAppBarEldycare
+import com.ensias.eldycare.mobile.smartphone.composables.main.relative.dialogs.AddConnectionPopup
 import com.ensias.eldycare.mobile.smartphone.data.Connection
 import com.ensias.eldycare.mobile.smartphone.service.ConnectionService
 import com.ensias.eldycare.mobile.smartphone.service.NotificationService
@@ -50,22 +40,22 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-@OptIn(DelicateCoroutinesApi::class)
+@OptIn(DelicateCoroutinesApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun RelativeHomePage(navController: NavController, context: Context) {
     var showAddConnectionPopup by remember { mutableStateOf(false) }
     var connectionList by remember { mutableStateOf(emptyList<Connection>()) }
-    // Trigger the refresh by changing this state
-    val isRefreshing by remember { mutableStateOf(false) }
-    // permission to send notifications
-    var hasNotificationPermission by remember { mutableStateOf(false) }
-    // request notification permission
+    var showDatePicker by remember { mutableStateOf(false) } // for date picker
+    val datePickerState = rememberDatePickerState() // for date picker
+    val isRefreshing by remember { mutableStateOf(false) } // Trigger the refresh by changing this state
+    var hasNotificationPermission by remember { mutableStateOf(false) } // permission to send notifications
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
         onResult = { hasNotificationPermission = it }
-    )
+    ) // request notification permission
 
 
 
@@ -81,16 +71,11 @@ fun RelativeHomePage(navController: NavController, context: Context) {
     context.startService(serviceIntent)
 
 
-
-
     LaunchedEffect(Unit){
         loadConnectionList(onConnectionListChange = { connectionList = it })
         Log.d("RelativeHomePage", "Requesting notification permission")
         permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
     }
-
-
-
 
 
     Scaffold(
@@ -108,7 +93,8 @@ fun RelativeHomePage(navController: NavController, context: Context) {
         }) {
             ConnectionsSection(
                 innerPadding = innerPadding,
-                connectionList = connectionList
+                connectionList = connectionList,
+                showDatePickerDialog = { showDatePicker = true },
             )
         }
         if(showAddConnectionPopup){
@@ -129,80 +115,17 @@ fun RelativeHomePage(navController: NavController, context: Context) {
     }
 }
 
+@OptIn(DelicateCoroutinesApi::class)
 fun loadConnectionList(onConnectionListChange: (List<Connection>) -> Unit){
-    // set the global connection list object
-    ConnectionService.loadConnectionList()
-    // set the list to trigger composition
-    if(ConnectionService.connectionList != null)
-        onConnectionListChange(ConnectionService.connectionList!!)
-    else
-        onConnectionListChange(emptyList())
-}
-//@OptIn(DelicateCoroutinesApi::class)
-//fun loadConnectionList(onConnectionListChange: (List<Connection>) -> Unit) {
-//    GlobalScope.launch {
-//        ApiClient().authApi.getElderContacts().body()?.let {
-//            Log.d("RelativeHomePage", "Got connection list : $it")
-//            val newConnections = it.map {
-//                Connection(
-//                    email = it.email,
-//                    name = it.username,
-//                    phone = if(it.phone == null) "" else it.phone, // TODO phone is never nullable
-//                    lastAlert = null // TODO
-//                )
-//            }
-//            // set the list to trigger composition
-//            onConnectionListChange(newConnections)
-//        }
-//
-//    }
-//}
-
-@Composable
-fun AddConnectionPopup(onDismiss: () -> Unit, onAddConnection: (String) -> Unit) {
-    var elderEmail by remember { mutableStateOf("") }
-    Surface (
-        modifier = Modifier.fillMaxSize(),
-        color = Color.Black.copy(alpha = 0.5f)
-    ){
-        Dialog(
-            onDismissRequest = onDismiss,
-        ){
-            Card (
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ){
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ){
-                    Text(text = "Add a connection", style = MaterialTheme.typography.headlineSmall)
-                    Spacer(modifier = Modifier.padding(8.dp))
-                    Text(text = "Who do you want to add ?")
-                    OutlinedTextField(
-                        modifier = Modifier.fillMaxWidth(),
-                        value = elderEmail,
-                        onValueChange = { elderEmail = it },
-                        label = { Text("Elder Email") }
-                    )
-                    Spacer(modifier = Modifier.padding(8.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.End
-                    ){
-                        Button(onClick = {
-                            onAddConnection(elderEmail)
-                            onDismiss()
-                            // TODO : should refresh the list
-                        }) {
-                            Text(text = "Add")
-                        }
-                    }
-
-                }
-
-            }
+    GlobalScope.launch {
+        // set the global connection list object
+        runBlocking {
+            ConnectionService.instance.loadConnectionList()
         }
+        // set the list to trigger composition
+        if(ConnectionService.connectionList != null)
+            onConnectionListChange(ConnectionService.connectionList!!)
+        else
+            onConnectionListChange(emptyList())
     }
 }
-

@@ -78,4 +78,7 @@ dependencies {
     implementation("io.reactivex.rxjava2:rxjava:2.2.5")
     implementation("io.reactivex.rxjava2:rxandroid:2.1.0")
     implementation("com.github.NaikSoftware:StompProtocolAndroid:1.6.6")
+
+    // datepicker
+    implementation("io.github.vanpra.compose-material-dialogs:datetime:0.8.1-rc")
 }

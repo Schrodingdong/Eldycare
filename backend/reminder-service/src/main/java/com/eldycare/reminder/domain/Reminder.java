@@ -1,16 +1,23 @@
 package com.eldycare.reminder.domain;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.ToString;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+
 /**
  * Represents a reminder document.
  */
 @Document(collection = "reminders")
 @Data
+@AllArgsConstructor
+@ToString
 public class Reminder {
 
     @Id
@@ -25,66 +32,10 @@ public class Reminder {
     @Field("description")
     private String description;
 
-    @Field("reminderDateTime")
-    private LocalDateTime reminderDateTime;
+    @Field("reminderDate")
+    private LocalDate reminderDate;
 
-    public Reminder() { }
+    @Field("reminderTime")
+    private LocalTime reminderTime;
 
-    public Reminder(String elderEmail, String relativeEmail, String description, LocalDateTime reminderDateTime) {
-        this.elderEmail = elderEmail;
-        this.relativeEmail = relativeEmail;
-        this.description = description;
-        this.reminderDateTime = reminderDateTime;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getElderEmail() {
-        return elderEmail;
-    }
-
-    public void setElderEmail(String elderEmail) {
-        this.elderEmail = elderEmail;
-    }
-
-    public String getRelativeEmail() {
-        return relativeEmail;
-    }
-
-    public void setRelativeEmail(String relativeEmail) {
-        this.relativeEmail = relativeEmail;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public LocalDateTime getReminderDateTime() {
-        return reminderDateTime;
-    }
-
-    public void setReminderDateTime(LocalDateTime reminderDateTime) {
-        this.reminderDateTime = reminderDateTime;
-    }
-
-    @Override
-    public String toString() {
-        return "Reminder{" +
-                "id='" + id + '\'' +
-                ", elderEmail='" + elderEmail + '\'' +
-                ", relativeEmail='" + relativeEmail + '\'' +
-                ", description='" + description + '\'' +
-                ", reminderDateTime=" + reminderDateTime +
-                '}';
-    }
 }

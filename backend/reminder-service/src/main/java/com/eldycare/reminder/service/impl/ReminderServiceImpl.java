@@ -13,20 +13,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 public class ReminderServiceImpl implements ReminderService {
 
-    @Autowired
-    private ReminderRepository reminderRepository;
-
-    @Autowired
-    private AmqpTemplate amqpTemplate;
+//    @Autowired
+//    private ReminderRepository reminderRepository;
 
     @Autowired
     private WebSocketReminderSender webSocketReminderSender;
 
-//    @Autowired
-//    private ReminderMapper reminderMapper;
 
     @Value("${amqp.queue}")
     private String reminderQueue;
@@ -35,14 +32,13 @@ public class ReminderServiceImpl implements ReminderService {
 
     @Override
     public void sendReminder(ReminderDto reminderDto) {
-
-        String elderEmail = reminderDto.getElderEmail();
-//        Reminder reminder = reminderMapper.toReminder(reminderDto);
         Reminder reminder = new Reminder(
+                UUID.randomUUID().toString(),
                 reminderDto.getElderEmail(),
                 reminderDto.getRelativeEmail(),
                 reminderDto.getDescription(),
-                reminderDto.getReminderDateTime()
+                reminderDto.getReminderDate(),
+                reminderDto.getReminderTime()
         );
         logger.info("sending this reminder to elder : {}", reminder);
         sendReminderToRelative(reminder);
@@ -51,8 +47,12 @@ public class ReminderServiceImpl implements ReminderService {
     // Method to send reminder to a specific elder
     private void sendReminderToRelative(Reminder reminder) {
         // Save the reminder to MongoDB
-        logger.info("sendReminderToRelative - reminder: {}", reminder);
-        reminderRepository.save(reminder);
+//        try{
+//            logger.info("sendReminderToRelative - reminder: {}", reminder);
+//            reminderRepository.save(reminder);
+//        } catch (Exception e) {
+//            logger.error("sendReminderToRelative - error: {}", e.getMessage());
+//        }
 
         // Send a WebSocket message to the elder
         webSocketReminderSender.sendReminder(

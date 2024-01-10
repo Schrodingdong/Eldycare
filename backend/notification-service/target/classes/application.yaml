@@ -4,8 +4,7 @@ server:
 spring:
   data:
     mongodb:
-#      uri: mongodb+srv://${DB_NAME}:${DB_PWD}@${CLUSTER_URI}/${DB_NAME}?retryWrites=true&w=majority
-      uri: mongodb://${DB_NAME}:${DB_PWD}@${CLUSTER_URI}/${DB_NAME}?retryWrites=true&w=majority
+      uri: mongodb://${MongoDB_USERNAME}:${MongoDB_PASSWORD}@${MongoDB_CLUSTER_URI}/${MongoDB_DATABASE}?retryWrites=true&w=majority
   application:
     name: notification-service
 

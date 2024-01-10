@@ -22,7 +22,6 @@ object AppOkHttpClient {
         .build()
 }
 object RetrofitClient {
-
     val retrofit: Retrofit by lazy {
         Retrofit.Builder()
             .baseUrl(ApiClient.BASE_URL)

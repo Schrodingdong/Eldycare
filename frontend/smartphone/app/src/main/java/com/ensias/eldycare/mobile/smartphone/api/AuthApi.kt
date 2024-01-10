@@ -6,8 +6,11 @@ import com.ensias.eldycare.mobile.smartphone.data.model.NotificationModel
 import com.ensias.eldycare.mobile.smartphone.data.api_model.LoginResponseModel
 import com.ensias.eldycare.mobile.smartphone.data.api_model.NotificationResponse
 import com.ensias.eldycare.mobile.smartphone.data.api_model.RegisterResponseModel
+import com.ensias.eldycare.mobile.smartphone.data.api_model.ReminderRequest
+import com.ensias.eldycare.mobile.smartphone.data.api_model.ReminderResponse
 import com.ensias.eldycare.mobile.smartphone.data.model.AuthLoginModel
 import com.ensias.eldycare.mobile.smartphone.data.model.AuthRegisterModel
+import com.ensias.eldycare.mobile.smartphone.data.model.ReminderModel
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -26,4 +29,6 @@ interface AuthApi {
     suspend fun getElderContacts() : Response<List<ElderContactsModel>>
     @PUT("/users/add/elder-contact/{email}")
     suspend fun addElderContact(@Path("email") email: String) : Response<ElderContactAddResponseModel>
+    @POST("/reminder/send")
+    suspend fun sendReminder(@Body reminderRequest: ReminderRequest) : Response<ReminderResponse>
 }

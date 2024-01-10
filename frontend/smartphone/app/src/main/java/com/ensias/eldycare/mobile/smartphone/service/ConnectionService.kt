@@ -11,22 +11,21 @@ class ConnectionService {
     companion object {
         val instance = ConnectionService()
         var connectionList: List<Connection>? = null
-        @OptIn(DelicateCoroutinesApi::class)
-        fun loadConnectionList() {
-            GlobalScope.launch {
-                ApiClient().authApi.getElderContacts().body()?.let {
-                    val newConnections = it.map {
-                        Connection(
-                            email = it.email,
-                            name = it.username,
-                            phone = it.phone,
-                            lastAlert = null // TODO
-                        )
-                    }
-                    // set the list to trigger composition
-                    connectionList = newConnections
+    }
+    @OptIn(DelicateCoroutinesApi::class)
+    suspend fun loadConnectionList() {
+        GlobalScope.launch {
+            ApiClient().authApi.getElderContacts().body()?.let {
+                val newConnections = it.map {
+                    Connection(
+                        email = it.email,
+                        name = it.username,
+                        phone = it.phone,
+                        lastAlert = null // TODO
+                    )
                 }
-
+                // set the list to trigger composition
+                connectionList = newConnections
             }
         }
     }

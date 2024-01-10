@@ -4,6 +4,8 @@ import com.eldycare.reminder.constants.ServiceConstants;
 import com.eldycare.reminder.dto.ReminderDto;
 import com.eldycare.reminder.service.service.ReminderService;
 import com.eldycare.reminder.utils.SystemUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,15 +19,20 @@ import org.springframework.web.bind.annotation.RestController;
 public class ReminderRest {
 
     @Autowired
-    ReminderService reminderService;
+    private ReminderService reminderService;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @PostMapping("/send")
     public ResponseEntity<?> sendReminder(@RequestBody ReminderDto reminderDto) {
+        ObjectNode objectNode = objectMapper.createObjectNode();
         try {
             reminderService.sendReminder(reminderDto);
-            return SystemUtils.getResponseEntity(ServiceConstants.REMINDER_SENT_SUCCESSFULLY, HttpStatus.OK);
+            objectNode.put("message", ServiceConstants.REMINDER_SENT_SUCCESSFULLY);
+            return ResponseEntity.ok().body(objectNode);
         } catch (Exception e) {
             e.printStackTrace();
+            objectNode.put("message", ServiceConstants.SOMETHING_WENT_WRONG);
             return SystemUtils.getResponseEntity(ServiceConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
