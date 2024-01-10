@@ -31,10 +31,10 @@ class CalendarProvider(val context: Context) {
             CalendarContract.Events.DTEND,
             CalendarContract.Events.EVENT_LOCATION,
             CalendarContract.Events.CALENDAR_ID,
-            CalendarContract.Events.EVENT_TIMEZONE
+            CalendarContract.Events.EVENT_TIMEZONE,
         )
-        // select titles that contains TITLE_PREFIX and future events
-        val selectionClause = "${CalendarContract.Events.TITLE} LIKE ? AND ${CalendarContract.Events.DTSTART} > ?"
+        // select titles that contains TITLE_PREFIX and future events and not deleted
+        val selectionClause = "${CalendarContract.Events.TITLE} LIKE ? AND ${CalendarContract.Events.DTSTART} > ? AND ${CalendarContract.Events.DELETED} = 0"
         val selectionArgs = arrayOf("%${ReminderCalendarEventModel.TITLE_PREFIX}%", System.currentTimeMillis().toString())
         val sortOrder = "${CalendarContract.Events.DTSTART} ASC"
         context.contentResolver.query(
