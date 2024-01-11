@@ -31,7 +31,6 @@ import com.ensias.eldycare.mobile.smartphone.theme.Typography
 
 @Composable
 fun AddConnectionPopup(onDismiss: () -> Unit, onAddConnection: (String) -> Unit) {
-    val mContext = LocalContext.current
     var elderEmail by remember { mutableStateOf("") }
     Surface (
         modifier = Modifier.fillMaxSize(),
@@ -67,7 +66,6 @@ fun AddConnectionPopup(onDismiss: () -> Unit, onAddConnection: (String) -> Unit)
                     ){
                         Button(onClick = {
                             onAddConnection(elderEmail)
-                            Toast.makeText(mContext, "Connection added", Toast.LENGTH_SHORT).show()
                             onDismiss()
                         }) {
                             Text(text = "Add")

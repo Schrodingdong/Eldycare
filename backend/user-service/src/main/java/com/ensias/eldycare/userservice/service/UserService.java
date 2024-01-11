@@ -64,6 +64,13 @@ public class UserService {
     }
 
     public void addElderContact(String userEmail, String elderContactEmail) {
+        // check if it exists :
+        try{
+            userRepository.findById(elderContactEmail).orElseThrow();
+        } catch (Exception e) {
+            throw new RuntimeException("Error while adding elder contact : " + e.getMessage());
+        }
+        // if not add
         userRepository.addElderContact(userEmail, elderContactEmail);
     }
 }
