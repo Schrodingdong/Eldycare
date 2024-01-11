@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.ensias.eldycare.mobile.smartphone"
+    namespace = "com.ensias.eldycare.mobile"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.ensias.eldycare.mobile.smartphone"
+        applicationId = "com.ensias.eldycare.mobile"
         minSdk = 27
         targetSdk = 34
         versionCode = 1
@@ -88,4 +88,7 @@ dependencies {
     implementation("androidx.room:room-runtime:$room_version")
     kapt("androidx.room:room-compiler:$room_version")
     implementation("androidx.room:room-ktx:$room_version")
+
+    // wearable
+    implementation("com.google.android.gms:play-services-wearable:18.1.0")
 }

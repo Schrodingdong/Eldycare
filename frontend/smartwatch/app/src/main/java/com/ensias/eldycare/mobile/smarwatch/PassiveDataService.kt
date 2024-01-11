@@ -1,4 +1,4 @@
-package com.example.android.wearable.composestarter.presentation
+package com.ensias.eldycare.mobile.smarwatch
 
 import android.util.Log
 import androidx.health.services.client.PassiveListenerService
@@ -11,6 +11,7 @@ class PassiveDataService : PassiveListenerService(){
     override fun onNewDataPointsReceived(dataPoints: DataPointContainer) {
         dataPoints.getData(DataType.HEART_RATE_BPM).forEach {
             Log.d("PassiveDataService", ">> onNewDataPointsReceived: ${it.value}")
+            // bundle and send data:
 
         }
     }

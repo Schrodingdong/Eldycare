@@ -34,7 +34,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
-import com.ensias.eldycare.mobile.smartphone.R
+import com.ensias.eldycare.mobile.R
 import com.ensias.eldycare.mobile.smartphone.UserType
 import com.ensias.eldycare.mobile.smartphone.api.ApiClient
 import com.ensias.eldycare.mobile.smartphone.composables.Screen
@@ -42,7 +42,26 @@ import com.ensias.eldycare.mobile.smartphone.composables.auth.signup.TopDecorWit
 import com.ensias.eldycare.mobile.smartphone.data.LoginData
 import com.ensias.eldycare.mobile.smartphone.data.model.AuthLoginModel
 import com.ensias.eldycare.mobile.smartphone.service.AuthService
+import com.google.android.gms.wearable.MessageClient
+import com.google.android.gms.wearable.MessageEvent
 import kotlinx.coroutines.delay
+
+
+
+class MyMessageListener : MessageClient.OnMessageReceivedListener {
+    override fun onMessageReceived(messageEvent: MessageEvent) {
+        val path = messageEvent.path
+        val message = String(messageEvent.data)
+        Log.d("PhoneApp", "Received message with path: $path and content: $message")
+        // Now you can handle the received message as needed.
+    }
+}
+
+
+
+
+
+
 
 /**
  * LOGIN PAGE

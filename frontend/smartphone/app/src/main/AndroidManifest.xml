@@ -22,16 +22,16 @@
         android:theme="@style/Theme.ComposeTest"
         tools:targetApi="31">
         <service
-            android:name=".service.NotificationService"
+            android:name=".smartphone.service.NotificationService"
             android:foregroundServiceType="mediaProjection"
             android:exported="false">
         </service>
         <service
-            android:name=".service.ReminderService"
+            android:name=".smartphone.service.ReminderService"
             android:exported="false">
         </service>
         <activity
-            android:name=".MainActivity"
+            android:name=".smartphone.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.ComposeTest"

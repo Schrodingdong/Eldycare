@@ -21,10 +21,11 @@ plugins {
 android {
     compileSdk 34
 
-    namespace "com.example.android.wearable.composestarter"
+    namespace "com.ensias.eldycare.mobile"
 
     defaultConfig {
-        applicationId "com.example.android.wearable.composestarter"
+//        applicationId "com.example.android.wearable.composestarter"
+        applicationId "com.ensias.eldycare.mobile"
         minSdk 30
         targetSdk 33
         versionCode 1
@@ -95,8 +96,7 @@ dependencies {
     debugImplementation libs.compose.ui.tooling
     debugImplementation composeBom
 
-    implementation "androidx.health:health-services-client:1.1.0-alpha01"
-    implementation 'com.google.android.gms:play-services-wearable:18.1.0'
-
+    implementation libs.androidx.health.services.client
+    implementation libs.play.services.wearable
 
 }

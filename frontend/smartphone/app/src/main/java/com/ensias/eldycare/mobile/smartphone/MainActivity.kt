@@ -22,13 +22,17 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.ensias.eldycare.mobile.smartphone.composables.Screen
 import com.ensias.eldycare.mobile.smartphone.composables.auth.login.LoginPage
+import com.ensias.eldycare.mobile.smartphone.composables.auth.login.MyMessageListener
 import com.ensias.eldycare.mobile.smartphone.composables.auth.signup.SignupPage
 import com.ensias.eldycare.mobile.smartphone.composables.main.elderly.ElderHomePage
 import com.ensias.eldycare.mobile.smartphone.composables.main.relative.RelativeHomePage
 import com.ensias.eldycare.mobile.smartphone.data.database.AlertDatabase
 import com.ensias.eldycare.mobile.smartphone.theme.ComposeTestTheme
+import com.google.android.gms.wearable.Wearable
 
 class MainActivity : ComponentActivity() {
+    val messageListener = MyMessageListener()
+
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,6 +40,9 @@ class MainActivity : ComponentActivity() {
         val context = this
         // init database
         AlertDatabase.init(context)
+        // init wearable listener
+        Wearable.getMessageClient(this).addListener(messageListener)
+
         setContent {
             ComposeTestTheme {
                 val navController = rememberNavController()
@@ -71,6 +78,12 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // remove wearable listener
+        Wearable.getMessageClient(this).removeListener(MyMessageListener())
     }
 }
 

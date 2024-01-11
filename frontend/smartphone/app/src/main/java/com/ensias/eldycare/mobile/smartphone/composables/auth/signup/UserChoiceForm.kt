@@ -24,7 +24,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.ensias.eldycare.mobile.smartphone.R
+import com.ensias.eldycare.mobile.R
 import com.ensias.eldycare.mobile.smartphone.data.SignupData
 import com.ensias.eldycare.mobile.smartphone.UserType
 

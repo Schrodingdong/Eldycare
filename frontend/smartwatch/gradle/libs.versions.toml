@@ -8,14 +8,17 @@ androidx-wear-compose = "1.2.1"
 androidx-wear-tiles = "1.1.0"
 androidx-wear-watchface = "1.0.1"
 compose-compiler = "1.5.4"
+health-services-client = "1.1.0-alpha01"
 ktlint = "0.50.0"
 org-jetbrains-kotlin = "1.9.20"
 org-jetbrains-kotlinx = "1.6.0"
+play-services-wearable = "18.1.0"
 
 [libraries]
 android-lint-gradle = "com.android.tools.lint:lint-gradle:31.2.0"
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "androidx-compose-bom" }
+androidx-health-services-client = { module = "androidx.health:health-services-client", version.ref = "health-services-client" }
 compose-compiler = { module = "androidx.compose.compiler:compiler", version.ref = "compose-compiler" }
 compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
 compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
@@ -23,6 +26,7 @@ compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview"
 jacoco-ant = "org.jacoco:org.jacoco.ant:0.8.11"
 junit = "junit:junit:4.13.2"
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "org-jetbrains-kotlin" }
+play-services-wearable = { module = "com.google.android.gms:play-services-wearable", version.ref = "play-services-wearable" }
 test-espresso-core = "androidx.test.espresso:espresso-core:3.5.1"
 test-ext-junit = "androidx.test.ext:junit:1.1.5"
 wear-compose-foundation = { module = "androidx.wear.compose:compose-foundation", version.ref = "androidx-wear-compose" }

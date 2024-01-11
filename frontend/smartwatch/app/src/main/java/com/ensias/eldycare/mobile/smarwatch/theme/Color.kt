@@ -13,20 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.android.wearable.composestarter.presentation.theme
+package com.ensias.eldycare.mobile.smarwatch.theme
 
-import androidx.compose.runtime.Composable
-import androidx.wear.compose.material.MaterialTheme
+import androidx.compose.ui.graphics.Color
+import androidx.wear.compose.material.Colors
 
-@Composable
-fun WearAppTheme(
-    content: @Composable () -> Unit
-) {
-    MaterialTheme(
-        colors = wearColorPalette,
-        typography = Typography,
-        // For shapes, we generally recommend using the default Material Wear shapes which are
-        // optimized for round and non-round devices.
-        content = content
-    )
-}
+val Blue200 = Color(0xFFAECBFA)
+val Purple500 = Color(0xFF6200EE)
+val Blue700 = Color(0xFF6694DE)
+val Teal200 = Color(0xFF03DAC5)
+val Red400 = Color(0xFFCF6679)
+
+internal val wearColorPalette: Colors = Colors(
+    primary = Blue200,
+    primaryVariant = Blue700,
+    secondary = Teal200,
+    secondaryVariant = Teal200,
+    error = Red400,
+    onPrimary = Color.Black,
+    onSecondary = Color.Black,
+    onError = Color.Black
+)

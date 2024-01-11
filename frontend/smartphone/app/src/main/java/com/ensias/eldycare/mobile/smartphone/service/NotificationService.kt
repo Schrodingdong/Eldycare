@@ -37,10 +37,10 @@ class NotificationService : Service(){
     // For the relatives
     fun buildAlertNotification(context: Context, notificationMessage: NotificationModel) {
         // Create a visually appealing and informative notification
-        val customView = RemoteViews(packageName, com.ensias.eldycare.mobile.smartphone.R.layout.alert_notification_layout)
-        val customViewLarge = RemoteViews(packageName, com.ensias.eldycare.mobile.smartphone.R.layout.alert_notification_layout_large)
+        val customView = RemoteViews(packageName, com.ensias.eldycare.mobile.R.layout.alert_notification_layout)
+        val customViewLarge = RemoteViews(packageName, com.ensias.eldycare.mobile.R.layout.alert_notification_layout_large)
         customView.setTextViewText(
-            com.ensias.eldycare.mobile.smartphone.R.id.notificationText,
+            com.ensias.eldycare.mobile.R.id.notificationText,
             notificationMessage.alertMessage
         )
 
@@ -49,20 +49,20 @@ class NotificationService : Service(){
             "Alert Time: ${notificationMessage.alertTime}\n" +
             "Location: ${notificationMessage.location}\n"
         customViewLarge.setTextViewText(
-            com.ensias.eldycare.mobile.smartphone.R.id.notificationText,
+            com.ensias.eldycare.mobile.R.id.notificationText,
             notificationLongString
         )
 
 
         // init badges
         notificationMessage.alertType.forEach {
-            val badge = RemoteViews(packageName, com.ensias.eldycare.mobile.smartphone.R.layout.alert_type_badge_layout)
+            val badge = RemoteViews(packageName, com.ensias.eldycare.mobile.R.layout.alert_type_badge_layout)
             badge.setTextViewText(
-                com.ensias.eldycare.mobile.smartphone.R.id.custom_badge,
+                com.ensias.eldycare.mobile.R.id.custom_badge,
                 it.name
             )
             customViewLarge.addView(
-                com.ensias.eldycare.mobile.smartphone.R.id.badge_container,
+                com.ensias.eldycare.mobile.R.id.badge_container,
                 badge
             )
         }
@@ -130,9 +130,9 @@ class NotificationService : Service(){
     }
     private fun buildServiceNotification(): Notification? {
         // Create a visually appealing and informative notification
-        val customView = RemoteViews(packageName, com.ensias.eldycare.mobile.smartphone.R.layout.service_notification_layout)
+        val customView = RemoteViews(packageName, com.ensias.eldycare.mobile.R.layout.service_notification_layout)
         val builder = NotificationCompat.Builder(this, Constants.CHANNEL_ID)
-            .setSmallIcon(com.ensias.eldycare.mobile.smartphone.R.drawable.hand_holding_hand_solid) // Use a more modern icon
+            .setSmallIcon(com.ensias.eldycare.mobile.R.drawable.hand_holding_hand_solid) // Use a more modern icon
             .setPriority(NotificationCompat.PRIORITY_MAX) // Adjust priority as needed
             .setCategory(NotificationCompat.CATEGORY_CALL) // Consider a more appropriate category
             .setCustomContentView(

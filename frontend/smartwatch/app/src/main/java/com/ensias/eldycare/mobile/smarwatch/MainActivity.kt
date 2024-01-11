@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.android.wearable.composestarter.presentation
+package com.ensias.eldycare.mobile.smarwatch
 
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -21,35 +21,27 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -59,18 +51,21 @@ import androidx.health.services.client.data.DataPointContainer
 import androidx.health.services.client.data.DataType
 import androidx.health.services.client.data.PassiveListenerConfig
 import androidx.health.services.client.getCapabilities
-import androidx.health.services.client.setPassiveListenerService
 import androidx.lifecycle.lifecycleScope
 import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
-import com.example.android.wearable.composestarter.R
-import com.example.android.wearable.composestarter.presentation.theme.WearAppTheme
+import com.google.android.gms.tasks.Tasks
+import com.google.android.gms.wearable.CapabilityClient
+import com.google.android.gms.wearable.CapabilityInfo
+import com.google.android.gms.wearable.Wearable
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
+private const val ANOMALY_DETECTION_CAPABILITY_NAME = "anomaly_detection"
+private const val ANOMALY_DETECTION_CAPABILITY_PATH = "/anomaly_detection"
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         val heartRateFlow = MutableStateFlow(0)
@@ -121,14 +116,76 @@ class MainActivity : ComponentActivity() {
             }
         }
         super.onCreate(savedInstanceState)
+
+
+
+        Wearable.getMessageClient(this).sendMessage(
+            "default_node",
+            "/message_path",
+            "Hello from the Wear OS app!".toByteArray()
+        ).apply {
+            addOnSuccessListener {
+                Log.d("MainActivity", "Message sent successfully")
+            }
+            addOnFailureListener {
+                Log.d("MainActivity", "Message failed to send")
+            }
+        }
+
         setContent {
             HeartRateScreen(heartRateFlow.collectAsState().value)
         }
     }
 }
 
+private fun setupVoiceTranscription() {
+//    updateTranscriptionCapability(capabilityInfo)
+}
+
 @Composable
 fun HeartRateScreen(heartRate: Int) {
+    val mContext = LocalContext.current
+
+
+    LaunchedEffect(key1 = null, block =  {
+        GlobalScope.launch {
+            // testing message sending
+            val capabilityInfo: CapabilityInfo = Tasks.await(
+                Wearable.getCapabilityClient(mContext)
+                    .getCapability(
+                        ANOMALY_DETECTION_CAPABILITY_NAME,
+                        CapabilityClient.FILTER_REACHABLE
+                    )
+            )
+            // capabilityInfo has the reachable nodes with the transcription capability
+            Log.d("MainActivity", "setupVoiceTranscription: ${capabilityInfo.nodes.size}")
+
+            // returns the closest node to us (for processing), or null if there are none
+            val nodes = capabilityInfo.nodes
+            val nodeId = nodes.firstOrNull { it.isNearby }?.id ?: nodes.firstOrNull()?.id
+
+            if(nodeId == null){
+                Log.d("MainActivity", "setupVoiceTranscription: no node found")
+                return@launch
+            }
+            Log.d("MainActivity", "setupVoiceTranscription: node found : $nodeId")
+            Wearable.getMessageClient(mContext).sendMessage(
+                nodeId,
+                ANOMALY_DETECTION_CAPABILITY_PATH,
+                "Hello from the Wear OS app!".toByteArray()
+            ).apply {
+                addOnSuccessListener {
+                    Log.d("MainActivity", "Message sent successfully")
+                }
+                addOnFailureListener {
+                    Log.d("MainActivity", "Message failed to send")
+                }
+            }
+
+        }
+    })
+
+
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -171,7 +228,7 @@ fun AnimatedEcgPulse() {
         label = " ecg pulse animation"
     )
     Icon(
-        painter = painterResource(id = R.drawable.ecg_vector),
+        painter = painterResource(id = com.ensias.eldycare.mobile.R.drawable.ecg_vector),
         contentDescription = null,
         tint = MaterialTheme.colors.primaryVariant,
         modifier = Modifier.alpha(visibility)

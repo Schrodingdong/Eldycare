@@ -28,7 +28,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.ensias.eldycare.mobile.smartphone.R
+import com.ensias.eldycare.mobile.R
 import com.ensias.eldycare.mobile.smartphone.composables.main.relative.dialogs.MyDatePickerDialog
 import com.ensias.eldycare.mobile.smartphone.composables.main.relative.dialogs.MyTimePickerDialog
 import com.ensias.eldycare.mobile.smartphone.data.Reminder
