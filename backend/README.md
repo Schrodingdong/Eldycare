@@ -4,6 +4,19 @@
 
 Backend component of the Eldycare project. We will be following a **Microservice Event Driven Architecture**
 
+## Compiling the images
+Being in this diretory, run the following commands :
+```bash
+mvn -DskipTests clean install
+.\mvnw -DskipTests clean install # if on windows
+```
+```bash
+.\create-images.bat
+```
+```bash
+docker-compose up
+```
+
 ## Getting Started
 - NEO4J Connection
   - Add these variables to your environment
