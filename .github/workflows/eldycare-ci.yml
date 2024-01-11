@@ -1,0 +1,66 @@
+name: eldycare backend CICD
+
+on:
+  push:
+    branches: ["master"]
+    paths: "backend/**"
+  pull_request:
+    branches: ["master"]
+    paths: "backend/**"
+
+
+jobs:
+  build-backend-images:
+    name: build-microservices
+    runs-on: ubuntu-latest
+    steps:
+      - name: Github Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: build
+        run: mvn package -DskipTests
+
+      - name: upload Artifacts for api-gateway
+        uses: actions/upload-artifact@v4.0.0
+        with:
+          name: api-gateway-service
+          path: ./backend/api-gateway-service/target/api-gateway-service-0.0.1-SNAPSHOT.jar
+
+      - name: upload Artifacts for authentication-service
+        uses: actions/upload-artifact@v4.0.0
+        with:
+          name: authentication-service
+          path: ./backend/authentication-service/target/authentication-service-0.0.1-SNAPSHOT.jar
+
+      - name: upload Artifacts for discovery-service
+        uses: actions/upload-artifact@v4.0.0
+        with:
+          name: discovery-service
+          path: ./backend/discovery-service/target/discovery-service-0.0.1-SNAPSHOT.jara
+      
+      - name: upload Artifacts for notification-service
+        uses: actions/upload-artifact@v4.0.0
+        with:
+          name: notification-service
+          path: ./backend/notification-service/target/notification-service-0.0.1-SNAPSHOT.jar
+      
+      - name: upload Artifacts for reminder-service
+        uses: actions/upload-artifact@v4.0.0
+        with:
+          name: reminder-service
+          path: ./backend/reminder-service/target/reminder-service-0.0.1-SNAPSHOT.jar
+
+      - name: upload Artifacts for user-service
+        uses: actions/upload-artifact@v4.0.0
+        with:
+          name: user-service
+          path: ./backend/user-service/target/user-service-0.0.1-SNAPSHOT.jar
+
+  
