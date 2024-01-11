@@ -3,6 +3,7 @@ package com.ensias.eldycare.mobile.smartphone.composables.main.elderly
 import android.content.Context
 import android.content.Intent
 import android.provider.Settings
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -35,6 +36,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -136,19 +138,6 @@ fun ElderHomePage(navController: NavController, context: Context){
 
         // Read reminders from calendar
         ReminderService.recomposeReminderList(context)
-//        CalendarProvider(context).readFromCalendar().forEach{
-//            val reminderTime = Instant.ofEpochMilli(it.dtstart).atZone(ZoneOffset.UTC).toLocalTime()
-//            val reminderDate = Instant.ofEpochMilli(it.dtstart).atZone(ZoneOffset.UTC).toLocalDate()
-//            val reminderEl = Reminder(
-//                reminderTime = reminderTime,
-//                reminderDate = reminderDate,
-//                description = it.title.subSequence(
-//                    startIndex = ReminderCalendarEventModel.TITLE_PREFIX.length,
-//                    endIndex = it.title.length
-//                ).toString()
-//            )
-//            reminderList = reminderList + reminderEl
-//        }
     }
 
     Scaffold(
@@ -245,133 +234,3 @@ fun ElderHomePage(navController: NavController, context: Context){
     }
 }
 
-@Composable
-fun AddReminderPopup(
-    onDismiss: () -> Unit,
-    reminderModel: ReminderModel,
-    onAddReminder: (Reminder) -> Unit,
-    onReminderChange: (ReminderModel) -> Unit,
-    formattedDate: String,
-    formattedTime: String,
-    dateDialogState: MaterialDialogState,
-    showDateDialog: (Boolean) -> Unit,
-    timeDialogState: MaterialDialogState,
-    showTimeDialog: (Boolean) -> Unit,
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Add Reminder" ) },
-        text = {
-            // ========================================================================================
-            Column {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Button(onClick = {
-//                showDatePickerDialog()
-                        showDateDialog(true)
-                    }) {
-                        androidx.compose.material.Text(text = "Date", color = MaterialTheme.colorScheme.onPrimary)
-                    }
-                    androidx.compose.material.Text(
-                        text = formattedDate,
-                        fontWeight = FontWeight.Light,
-//                fontSize = MaterialTheme.typography.bodySmall.fontSize
-                    )
-                }
-                // ========================================================================================
-                Spacer(modifier = Modifier.height(8.dp))
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Button(onClick = {
-                        showTimeDialog(true)
-                    }) {
-                        androidx.compose.material.Text(text = "Time", color = MaterialTheme.colorScheme.onPrimary)
-                    }
-                    androidx.compose.material.Text(
-                        text = formattedTime,
-                        fontWeight = FontWeight.Light,
-//                fontSize = MaterialTheme.typography.bodySmall.fontSize
-                    )
-                }
-                // ========================================================================================
-                Spacer(modifier = Modifier.height(8.dp))
-                OutlinedTextField(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(150.dp),
-                    value = reminderModel.description,
-                    onValueChange = { onReminderChange(reminderModel.copy(description = it))},
-                    label = { androidx.compose.material.Text(text = "Description") },
-                )
-
-            }
-        },
-        confirmButton = {
-            Button(
-                onClick = {
-                    val reminder = Reminder(
-                        reminderTime = reminderModel.reminderTime,
-                        reminderDate = reminderModel.reminderDate,
-                        description = reminderModel.description
-                    )
-                    onAddReminder(reminder)
-                    onDismiss()
-                }
-            ) {
-                Text("Add")
-            }
-        },
-        dismissButton = {
-            Button(
-                onClick = onDismiss,
-
-            ) {
-                Text("Cancel")
-            }
-        }
-    )
-    MyDatePickerDialog(
-        dateDialogState = dateDialogState,
-        onReminderChange = onReminderChange,
-        showDateDialog = showDateDialog,
-        showTimeDialog = showTimeDialog,
-        reminder = reminderModel
-    )
-    MyTimePickerDialog(
-        timeDialogState = timeDialogState,
-        onReminderChange = onReminderChange,
-        showTimeDialog = showTimeDialog,
-        reminder = reminderModel
-    )
-}
-
-@Preview
-@Composable
-fun ElderHomePagePreviewReminders(){
-    Scaffold(
-        topBar = {
-            TopAppBarEldycare()
-        },
-    ){ innerPadding ->
-        RemindersSectionComposable(innerPadding = innerPadding)
-    }
-}
-@Preview
-@Composable
-fun ElderHomePagePreviewAlerts(){
-    Scaffold(
-        topBar = {
-            TopAppBarEldycare()
-        },
-    ){ innerPadding ->
-        AlertSectionComposable(innerPadding = innerPadding)
-    }
-}

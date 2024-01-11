@@ -33,7 +33,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // init variables
-        context = this
+        val context = this
         // init database
         AlertDatabase.init(context)
         setContent {
@@ -71,14 +71,6 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-    }
-
-    companion object {
-        lateinit var context: Context
-        // Function to generate a Toast
-        fun mToast(message : String){
-            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
-        }
     }
 }
 

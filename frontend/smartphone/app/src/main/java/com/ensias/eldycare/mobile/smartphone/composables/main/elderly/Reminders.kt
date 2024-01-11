@@ -1,27 +1,39 @@
 package com.ensias.eldycare.mobile.smartphone.composables.main.elderly
 
+import android.widget.Toast
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.ensias.eldycare.mobile.smartphone.R
+import com.ensias.eldycare.mobile.smartphone.composables.main.relative.dialogs.MyDatePickerDialog
+import com.ensias.eldycare.mobile.smartphone.composables.main.relative.dialogs.MyTimePickerDialog
 import com.ensias.eldycare.mobile.smartphone.data.Reminder
+import com.ensias.eldycare.mobile.smartphone.data.model.ReminderModel
+import com.vanpra.composematerialdialogs.MaterialDialogState
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -122,4 +134,114 @@ fun ReminderItem(reminder: Reminder) {
             // TODO if there is a localisation or other tha ELDYCARE case insensitive
         }
     }
+}
+
+@Composable
+fun AddReminderPopup(
+    onDismiss: () -> Unit,
+    reminderModel: ReminderModel,
+    onAddReminder: (Reminder) -> Unit,
+    onReminderChange: (ReminderModel) -> Unit,
+    formattedDate: String,
+    formattedTime: String,
+    dateDialogState: MaterialDialogState,
+    showDateDialog: (Boolean) -> Unit,
+    timeDialogState: MaterialDialogState,
+    showTimeDialog: (Boolean) -> Unit,
+) {
+    val mContext = LocalContext.current
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { androidx.compose.material3.Text("Add Reminder" ) },
+        text = {
+            // ========================================================================================
+            Column {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Button(onClick = {
+//                showDatePickerDialog()
+                        showDateDialog(true)
+                    }) {
+                        Text(text = "Date", color = MaterialTheme.colorScheme.onPrimary)
+                    }
+                    Text(
+                        text = formattedDate,
+                        fontWeight = FontWeight.Light,
+//                fontSize = MaterialTheme.typography.bodySmall.fontSize
+                    )
+                }
+                // ========================================================================================
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Button(onClick = {
+                        showTimeDialog(true)
+                    }) {
+                        Text(text = "Time", color = MaterialTheme.colorScheme.onPrimary)
+                    }
+                    Text(
+                        text = formattedTime,
+                        fontWeight = FontWeight.Light,
+//                fontSize = MaterialTheme.typography.bodySmall.fontSize
+                    )
+                }
+                // ========================================================================================
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(150.dp),
+                    value = reminderModel.description,
+                    onValueChange = { onReminderChange(reminderModel.copy(description = it))},
+                    label = { Text(text = "Description") },
+                )
+
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    val reminder = Reminder(
+                        reminderTime = reminderModel.reminderTime,
+                        reminderDate = reminderModel.reminderDate,
+                        description = reminderModel.description
+                    )
+                    onAddReminder(reminder)
+                    Toast.makeText(mContext, "Reminder added", Toast.LENGTH_SHORT).show()
+                    onDismiss()
+                }
+            ) {
+                androidx.compose.material3.Text("Add")
+            }
+        },
+        dismissButton = {
+            Button(
+                onClick = onDismiss,
+
+                ) {
+                androidx.compose.material3.Text("Cancel")
+            }
+        }
+    )
+    MyDatePickerDialog(
+        dateDialogState = dateDialogState,
+        onReminderChange = onReminderChange,
+        showDateDialog = showDateDialog,
+        showTimeDialog = showTimeDialog,
+        reminder = reminderModel
+    )
+    MyTimePickerDialog(
+        timeDialogState = timeDialogState,
+        onReminderChange = onReminderChange,
+        showTimeDialog = showTimeDialog,
+        reminder = reminderModel
+    )
 }
