@@ -1,6 +1,7 @@
 name: eldycare backend CICD
 
 on:
+  workflow_dispatch:
   push:
     branches: ["master"]
     paths: "backend/**"
