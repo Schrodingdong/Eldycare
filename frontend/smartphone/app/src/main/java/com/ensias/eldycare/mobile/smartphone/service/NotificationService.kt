@@ -70,7 +70,7 @@ class NotificationService : Service(){
         // Create an Intent to make a call
         val callIntent = Intent(Intent.ACTION_DIAL)
         if(notificationMessage.elderEmail != null)
-            ConnectionService.connectionList!!.find { it.email == notificationMessage.elderEmail }?.let {
+            ConnectionService.connectionList.find { it.email == notificationMessage.elderEmail }?.let {
                 callIntent.data = Uri.parse("tel:${it.phone}")
             }
         else
@@ -112,14 +112,20 @@ class NotificationService : Service(){
         initNotificationChannel()
 
         // get connectionList
-        val connectionList = intent?.getStringArrayListExtra("connection-list")
-        Log.d("NotificationService", "Connection list : $connectionList")
+//        val connectionList = intent?.getStringArrayListExtra("connection-list")
+//        Log.d("NotificationService", "Connection list : $connectionList")
+        val connectionList = ConnectionService.connectionList.map { it.email } as ArrayList<String>
 
         // Initialize Websocket client
         initializeWebsocketClients(connectionList)
 
         // Show notification and run as a foreground service
         startForeground(99999999, buildServiceNotification())
+
+        // instance
+        instance = this
+
+        // return sticky
         return START_STICKY
     }
     private fun buildServiceNotification(): Notification? {
@@ -137,12 +143,20 @@ class NotificationService : Service(){
     }
 
 
-    private fun initializeWebsocketClients(connectionList: ArrayList<String>?) {
+    val initializedEldersWithWebsocketClients = ArrayList<String>()
+    fun initializeWebsocketClients(connectionList: ArrayList<String>?) {
+        Log.d("NotificationService", "Initializing websocket clients... : " + connectionList?.size)
         connectionList?.forEach {
+            if (initializedEldersWithWebsocketClients.contains(it)) return@forEach
             Log.d("NotificationService", "Connecting to : $it")
             val websocketClient = NotificationWebsocketClient(it, this, ::buildAlertNotification)
             websocketClient.connect()
+            initializedEldersWithWebsocketClients.add(it)
         }
+    }
+
+    companion object{
+        var instance : NotificationService? = null
     }
 
     private fun initNotificationChannel() {

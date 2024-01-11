@@ -48,7 +48,7 @@ import kotlinx.coroutines.runBlocking
 @Composable
 fun RelativeHomePage(navController: NavController, context: Context) {
     var showAddConnectionPopup by remember { mutableStateOf(false) }
-    var connectionList by remember { mutableStateOf(emptyList<Connection>()) }
+    var connectionList by remember { mutableStateOf(listOf<Connection>()) }
     var showDatePicker by remember { mutableStateOf(false) } // for date picker
     val isRefreshing by remember { mutableStateOf(false) } // Trigger the refresh by changing this state
     var hasNotificationPermission by remember { mutableStateOf(false) } // permission to send notifications
@@ -58,23 +58,31 @@ fun RelativeHomePage(navController: NavController, context: Context) {
     ) // request notification permission
 
 
-    // Start the notification service
-    LaunchedEffect(key1 = null, block = {// similar to react, execute once
-        val serviceIntent = Intent(context, NotificationService::class.java)
-        val connectionArrayList = ArrayList<String>()
-        connectionList.forEach {
-            connectionArrayList.add(it.email)
-        }
-        serviceIntent.putStringArrayListExtra("connection-list", connectionArrayList)
-        serviceIntent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
-        context.startService(serviceIntent)
-    })
-
-
+    // TODO problem with this
+    var firstLaunch = true
     LaunchedEffect(Unit){
-        loadConnectionList(onConnectionListChange = { connectionList = it })
+        Log.d("RelativeHomePage", "connection Before load : $connectionList")
+        runBlocking {
+            loadConnectionList(onConnectionListChange = { connectionList = it })
+        }
+        Log.d("RelativeHomePage", "connection after load : $connectionList")
+        ConnectionService.connectionList = connectionList
+        Log.d("RelativeHomePage", "setting it globaly ${ConnectionService.connectionList}")
         Log.d("RelativeHomePage", "Requesting notification permission")
         permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        if (firstLaunch){
+            Log.d("RelativeHomePage", "First launch")
+            firstLaunch = false
+            val serviceIntent = Intent(context, NotificationService::class.java)
+            val connectionArrayList = ArrayList<String>()
+            connectionList.forEach {
+                connectionArrayList.add(it.email)
+            }
+            Log.d("RelativeHomePage", "Starting notification service with connection list : $connectionArrayList")
+            serviceIntent.putStringArrayListExtra("connection-list", connectionArrayList)
+            serviceIntent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+            context.startService(serviceIntent)
+        }
     }
 
 
@@ -89,7 +97,14 @@ fun RelativeHomePage(navController: NavController, context: Context) {
         }
     ){ innerPadding ->
         SwipeRefresh(state = rememberSwipeRefreshState(isRefreshing = isRefreshing), onRefresh = {
-            loadConnectionList(onConnectionListChange = { connectionList = it })
+            GlobalScope.launch {
+                Log.d("RelativeHomePage", "Refreshing connection list")
+                runBlocking {
+                    loadConnectionList(onConnectionListChange = { connectionList = it })
+                }
+                Log.d("RelativeHomePage", "connection after load : $connectionList")
+                ConnectionService.connectionList = connectionList
+            }
         }) {
             ConnectionsSection(
                 innerPadding = innerPadding,
@@ -100,11 +115,22 @@ fun RelativeHomePage(navController: NavController, context: Context) {
         if(showAddConnectionPopup){
             AddConnectionPopup(
                 onDismiss = { showAddConnectionPopup = false },
-                onAddConnection = { email ->
+                onAddConnection = { elderEmail ->
                     GlobalScope.launch {
-                        ApiClient().authApi.addElderContact(email).body()?.let {
+                        ApiClient().authApi.addElderContact(elderEmail).body()?.let {
                             Log.d("RelativeHomePage", "Added connection : $it")
-                            loadConnectionList(onConnectionListChange = { connectionList = it })
+                            runBlocking {
+                                loadConnectionList(onConnectionListChange = { connectionList = it })
+                            }
+                            Log.d("RelativeHomePage", "connection after load : $connectionList")
+                            ConnectionService.connectionList = connectionList
+                            // to ArrayList<String>
+                            val connectionArrayList = ArrayList<String>()
+                            connectionList.forEach {
+                                connectionArrayList.add(it.email)
+                            }
+                            // initialise the notification websocket
+                            NotificationService.instance!!.initializeWebsocketClients(connectionArrayList)
                         }
                     }.let {
                         showAddConnectionPopup = false
@@ -116,14 +142,8 @@ fun RelativeHomePage(navController: NavController, context: Context) {
 }
 
 @OptIn(DelicateCoroutinesApi::class)
-fun loadConnectionList(onConnectionListChange: (List<Connection>) -> Unit){
-    GlobalScope.launch {
-        // set the global connection list object
-        ConnectionService.instance.loadConnectionList(onConnectionListChange)
-//        // set the list to trigger composition
-//        if(ConnectionService.connectionList != null)
-//            onConnectionListChange(ConnectionService.connectionList!!)
-//        else
-//            onConnectionListChange(emptyList())
-    }
+suspend fun loadConnectionList(onConnectionListChange: (List<Connection>) -> Unit){
+    // set the global connection list object
+    val retrievedConnectionlist = ConnectionService.loadConnectionList()
+    onConnectionListChange(retrievedConnectionlist)
 }
