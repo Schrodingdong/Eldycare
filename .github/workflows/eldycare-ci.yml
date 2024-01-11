@@ -18,6 +18,12 @@ jobs:
       - name: Github Checkout
         uses: actions/checkout@v3
 
+      - name: Position in backend folder
+        run: cd backend
+        
+      - name: contents of backend folder
+        run: ls -l
+
       - name: Set up JDK 21
         uses: actions/setup-java@v3
         with:
@@ -26,7 +32,7 @@ jobs:
           cache: maven
 
       - name: build
-        run: mvn package -DskipTests
+        run: mvn -DskipTests clean install
 
       - name: upload Artifacts for api-gateway
         uses: actions/upload-artifact@v4.0.0
