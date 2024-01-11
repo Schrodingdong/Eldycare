@@ -32,7 +32,7 @@ import com.ensias.eldycare.mobile.smartphone.UserType
  * USER CHOICE PAGE
  */
 @Composable
-fun UserTypeChoicePage(signupData: SignupData, signupStep: Int, onSignupDataChange: (SignupData) -> Unit, onSignupStepChange: (Int) -> Unit, navController: NavController){
+fun UserChoiceForm(signupData: SignupData, signupStep: Int, onSignupDataChange: (SignupData) -> Unit, onSignupStepChange: (Int) -> Unit, navController: NavController){
     Surface(
         color = MaterialTheme.colorScheme.background
     ) {
@@ -41,10 +41,10 @@ fun UserTypeChoicePage(signupData: SignupData, signupStep: Int, onSignupDataChan
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            TopDecorWithText("YOU ARE ?")
+            TopDecorWithText("WHICH ARE\nYOU")
             Column(
                 modifier = Modifier
-                    .padding(bottom = 56.dp)
+                    .padding(bottom = 16.dp)
                     .fillMaxHeight(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.SpaceBetween
@@ -73,7 +73,7 @@ fun CloseRelativeCard(signupData: SignupData, signupStep: Int, onSignupDataChang
             onSignupDataChange(signupData.copy(userType = UserType.RELATIVE))
             onSignupStepChange(signupStep + 1)
         },
-        modifier= Modifier.width(300.dp)
+        modifier= Modifier.width(225.dp)
     ){
         Column (
             modifier = Modifier
@@ -84,7 +84,7 @@ fun CloseRelativeCard(signupData: SignupData, signupStep: Int, onSignupDataChang
         ) {
             Text(text = "Close Relative", fontSize = 24.sp)
             Image(
-                modifier = Modifier.size(175.dp),
+                modifier = Modifier.size(190.dp),
                 painter = painterResource(id = R.drawable.close_relative),
                 contentDescription = "close_relative"
             )
@@ -106,7 +106,7 @@ fun ElderlyCard(signupData: SignupData, signupStep: Int, onSignupDataChange: (Si
             onSignupDataChange(signupData.copy(userType = UserType.ELDERLY))
             onSignupStepChange(signupStep + 1)
         },
-        modifier= Modifier.width(300.dp)
+        modifier= Modifier.width(225.dp)
     ){
         Column (
             modifier = Modifier
@@ -117,7 +117,7 @@ fun ElderlyCard(signupData: SignupData, signupStep: Int, onSignupDataChange: (Si
         ) {
             Text(text = "Elderly person", fontSize = 24.sp)
             Image(
-                modifier = Modifier.size(175.dp),
+                modifier = Modifier.size(190.dp),
                 painter = painterResource(id = R.drawable.elderly_person),
                 contentDescription = "close_relative"
             )

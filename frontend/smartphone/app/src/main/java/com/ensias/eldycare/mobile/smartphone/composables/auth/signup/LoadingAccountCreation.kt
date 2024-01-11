@@ -38,7 +38,7 @@ import kotlinx.coroutines.withContext
  * LOADING PAGE FOR ACCOUNT CREATION
  */
 @Composable
-fun LoadingAccountCreationPage(signupData: SignupData, navController: NavController){
+fun LoadingAccountCreation(signupData: SignupData, navController: NavController){
     var showErrorCreatingAccountDialog by remember { mutableStateOf(false) }
     Log.d("LoadingAccountCreationPage", "Data to send : \n\t>> " + signupData.toString())
 

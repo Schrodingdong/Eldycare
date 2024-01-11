@@ -41,7 +41,7 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 NavHost(navController = navController, startDestination = "auth"){
                     navigation(
-                        startDestination = Screen.Signup.route,
+                        startDestination = Screen.Login.route,
                         route = "auth"
                     ){
                         composable(Screen.Signup.route) {

@@ -69,7 +69,7 @@ fun LoginPage(navController: NavController) {
             TopDecorWithText("LOGIN")
             Column(
                 modifier = Modifier
-                    .padding(start = 32.dp, end = 32.dp, bottom = 56.dp)
+                    .padding(start = 32.dp, end = 32.dp, bottom = 16.dp)
                     .fillMaxHeight(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.SpaceBetween
