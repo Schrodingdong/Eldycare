@@ -2,6 +2,7 @@ package com.ensias.eldycare.mobile.smartphone.composables.main.relative
 
 import android.os.Build
 import android.util.Log
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -30,6 +31,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.ensias.eldycare.mobile.smartphone.composables.main.relative.bottom_sheet.BottomSheetContent
@@ -40,6 +42,7 @@ import kotlinx.coroutines.runBlocking
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConnectionsSection(innerPadding: PaddingValues, connectionList: List<Connection>? = null, showDatePickerDialog: () -> Unit){
+    val mContext = LocalContext.current
     var showBottomSheet by remember { mutableStateOf(false) }
     val clickedConnection by remember { mutableStateOf(Connection("","", "")) }
     val sheetState = rememberModalBottomSheetState(
@@ -70,12 +73,6 @@ fun ConnectionsSection(innerPadding: PaddingValues, connectionList: List<Connect
                     Text(text = "No connections yet")
                 }
             }
-//        ConnectionsList(
-//            connectionList = if(connectionList.isNullOrEmpty()) connectionMockList else connectionList,
-//            onConnectionClick = { showBottomSheet = true },
-//            clickedConnection = clickedConnection
-//        )
-
         }
         // bottom sheet logic
         if(showBottomSheet){
@@ -84,7 +81,14 @@ fun ConnectionsSection(innerPadding: PaddingValues, connectionList: List<Connect
                 onDismissRequest = { showBottomSheet = false },
                 sheetState = sheetState
             ){
-                BottomSheetContent(clickedConnection, showDatePickerDialog)
+                BottomSheetContent(
+                    connection = clickedConnection,
+                    showDatePickerDialog = showDatePickerDialog,
+                    onDismissBottomSheet = {
+                        showBottomSheet = false
+                        Toast.makeText(mContext, it, Toast.LENGTH_SHORT).show()
+                    }
+                )
             }
         }
 
@@ -109,27 +113,6 @@ fun SectionTitle(text: String){
     }
 
 }
-
-//@Composable
-//fun ConnectionsList(connectionList: List<Connection> = emptyList(), onConnectionClick: () -> Unit, clickedConnection: Connection) {
-//    LazyColumn(
-//        modifier = Modifier
-//            .verticalScroll(rememberScrollState())
-//            .fillMaxHeight()
-//            .fillMaxWidth()
-//            .padding(start = 32.dp, end = 32.dp, bottom = 8.dp)
-//    ){
-//
-//        items(connectionList.size){
-//            ConnectionItem(connectionList[it], onConnectionClick, clickedConnection)
-//            Divider()
-//        }
-////        connectionList.forEach { connection ->
-////            ConnectionItem(connection, onConnectionClick, clickedConnection)
-////        }
-//    }
-//}
-
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -170,12 +153,6 @@ fun ConnectionItem(connection: Connection, onConnectionClick: () -> Unit, clicke
                 }
 
             }
-//            Button(
-////                modifier = Modifier.width(25.dp),
-//                onClick = { /*TODO*/ }
-//            ) {
-//                Icon(Icons.Filled.KeyboardArrowRight, contentDescription = "Connection Icon", tint = MaterialTheme.colorScheme.onPrimary)
-//            }
         }
     }
 }

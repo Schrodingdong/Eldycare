@@ -5,6 +5,7 @@ import android.app.FragmentManager
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
@@ -32,7 +33,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // init variables
-        val context: Context = this
+        context = this
         // init database
         AlertDatabase.init(context)
         setContent {
@@ -70,6 +71,14 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+    }
+
+    companion object {
+        lateinit var context: Context
+        // Function to generate a Toast
+        fun mToast(message : String){
+            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+        }
     }
 }
 

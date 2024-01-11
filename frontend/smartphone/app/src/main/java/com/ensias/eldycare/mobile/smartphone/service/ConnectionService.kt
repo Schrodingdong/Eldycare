@@ -1,6 +1,5 @@
 package com.ensias.eldycare.mobile.smartphone.service
 
-import android.util.Log
 import com.ensias.eldycare.mobile.smartphone.api.ApiClient
 import com.ensias.eldycare.mobile.smartphone.data.Connection
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -13,7 +12,7 @@ class ConnectionService {
         var connectionList: List<Connection>? = null
     }
     @OptIn(DelicateCoroutinesApi::class)
-    suspend fun loadConnectionList() {
+    suspend fun loadConnectionList(onConnectionListChange : (List<Connection>) -> Unit = {}) {
         GlobalScope.launch {
             ApiClient().authApi.getElderContacts().body()?.let {
                 val newConnections = it.map {
@@ -25,7 +24,8 @@ class ConnectionService {
                     )
                 }
                 // set the list to trigger composition
-                connectionList = newConnections
+                onConnectionListChange(newConnections)
+//                connectionList = newConnections
             }
         }
     }

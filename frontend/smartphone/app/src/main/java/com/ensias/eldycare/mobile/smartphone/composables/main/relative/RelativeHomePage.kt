@@ -50,7 +50,6 @@ fun RelativeHomePage(navController: NavController, context: Context) {
     var showAddConnectionPopup by remember { mutableStateOf(false) }
     var connectionList by remember { mutableStateOf(emptyList<Connection>()) }
     var showDatePicker by remember { mutableStateOf(false) } // for date picker
-    val datePickerState = rememberDatePickerState() // for date picker
     val isRefreshing by remember { mutableStateOf(false) } // Trigger the refresh by changing this state
     var hasNotificationPermission by remember { mutableStateOf(false) } // permission to send notifications
     val permissionLauncher = rememberLauncherForActivityResult(
@@ -120,13 +119,11 @@ fun RelativeHomePage(navController: NavController, context: Context) {
 fun loadConnectionList(onConnectionListChange: (List<Connection>) -> Unit){
     GlobalScope.launch {
         // set the global connection list object
-        runBlocking {
-            ConnectionService.instance.loadConnectionList()
-        }
-        // set the list to trigger composition
-        if(ConnectionService.connectionList != null)
-            onConnectionListChange(ConnectionService.connectionList!!)
-        else
-            onConnectionListChange(emptyList())
+        ConnectionService.instance.loadConnectionList(onConnectionListChange)
+//        // set the list to trigger composition
+//        if(ConnectionService.connectionList != null)
+//            onConnectionListChange(ConnectionService.connectionList!!)
+//        else
+//            onConnectionListChange(emptyList())
     }
 }

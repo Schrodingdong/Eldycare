@@ -38,6 +38,7 @@ import com.ensias.eldycare.mobile.smartphone.data.api_model.ReminderResponse
 import com.ensias.eldycare.mobile.smartphone.data.model.ReminderModel
 import com.vanpra.composematerialdialogs.MaterialDialogState
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -53,7 +54,7 @@ import java.util.Locale
 // ========================================================================================
 @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 @Composable
-fun BottomSheetContent(connection: Connection, showDatePickerDialog: () -> Unit){
+fun BottomSheetContent(connection: Connection, showDatePickerDialog: () -> Unit, onDismissBottomSheet: (String) -> Unit){
     var reminder by remember {
         mutableStateOf(ReminderModel(
             reminderDate = LocalDate.now(),
@@ -103,6 +104,7 @@ fun BottomSheetContent(connection: Connection, showDatePickerDialog: () -> Unit)
             showDateDialog = { if(it == true) dateDialogState.show() else dateDialogState.hide() },
             timeDialogState = timeDialogState,
             showTimeDialog = { if(it == true) timeDialogState.show() else timeDialogState.hide() },
+            onDismissBottomSheet = onDismissBottomSheet
         )
     }
 }
@@ -119,6 +121,7 @@ fun BottomSheetAddReminder(
     showDateDialog: (Boolean) -> Unit,
     timeDialogState: MaterialDialogState,
     showTimeDialog: (Boolean) -> Unit,
+    onDismissBottomSheet: (String) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -198,10 +201,12 @@ fun BottomSheetAddReminder(
                         elderEmail = reminder.elderEmail,
                         relativeEmail = reminder.relativeEmail
                     )
+                    // sent to the server
                     runBlocking{
                         res = ApiClient().authApi.sendReminder(reminderRequest)
                         Log.d("BottomSheetContent", "reminder : " + reminderRequest.toString())
                     }
+                    // w8 for response for 10 seconds
                     var counter = 0
                     val THRESHOLD = 10
                     while(!res.isSuccessful && counter < THRESHOLD){
@@ -209,10 +214,17 @@ fun BottomSheetAddReminder(
                         Log.d("BottomSheetContent", "is succesfull : " +  res.isSuccessful)
                         counter++
                     }
+                    // action to partake
                     if(counter == THRESHOLD && !res.isSuccessful){
                         Log.d("BottomSheetContent", "is succesfull : " +  res.isSuccessful)
+                        launch(Dispatchers.Main) {// FINALLLYYYYYYYYYYYYYYYYYYYYYYYY
+                            onDismissBottomSheet("Failed to send reminder")
+                        }
                     } else {
                         Log.d("BottomSheetContent", "is succesfull : " +  res.isSuccessful)
+                        launch(Dispatchers.Main) {
+                            onDismissBottomSheet("Reminder Sent !")
+                        }
                     }
                 }
             }) {

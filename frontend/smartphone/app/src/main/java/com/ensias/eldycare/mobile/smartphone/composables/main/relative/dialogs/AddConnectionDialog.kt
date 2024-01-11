@@ -1,5 +1,6 @@
 package com.ensias.eldycare.mobile.smartphone.composables.main.relative.dialogs
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -29,6 +31,7 @@ import com.ensias.eldycare.mobile.smartphone.theme.Typography
 
 @Composable
 fun AddConnectionPopup(onDismiss: () -> Unit, onAddConnection: (String) -> Unit) {
+    val mContext = LocalContext.current
     var elderEmail by remember { mutableStateOf("") }
     Surface (
         modifier = Modifier.fillMaxSize(),
@@ -64,8 +67,8 @@ fun AddConnectionPopup(onDismiss: () -> Unit, onAddConnection: (String) -> Unit)
                     ){
                         Button(onClick = {
                             onAddConnection(elderEmail)
+                            Toast.makeText(mContext, "Connection added", Toast.LENGTH_SHORT).show()
                             onDismiss()
-                            // TODO : should refresh the list
                         }) {
                             Text(text = "Add")
                         }
