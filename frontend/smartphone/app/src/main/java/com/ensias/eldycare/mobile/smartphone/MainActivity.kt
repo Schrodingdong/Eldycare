@@ -3,6 +3,8 @@ package com.ensias.eldycare.mobile.smartphone
 import android.app.Fragment
 import android.app.FragmentManager
 import android.content.Context
+import android.content.res.AssetFileDescriptor
+import android.content.res.AssetManager
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
@@ -29,6 +31,11 @@ import com.ensias.eldycare.mobile.smartphone.composables.main.relative.RelativeH
 import com.ensias.eldycare.mobile.smartphone.data.database.AlertDatabase
 import com.ensias.eldycare.mobile.smartphone.theme.ComposeTestTheme
 import com.google.android.gms.wearable.Wearable
+import org.tensorflow.lite.Interpreter
+import java.io.FileInputStream
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
+import java.nio.channels.FileChannel
 
 class MainActivity : ComponentActivity() {
     val messageListener = MyMessageListener()
@@ -94,4 +101,19 @@ inline fun <reified T: ViewModel> NavBackStackEntry.sharedViewModel(navControlle
         navController.getBackStackEntry(navGraphRoute)
     }
     return viewModel(parentEntry)
+}
+
+class MyView : SkiaRenderer() {
+    private val knnModel: KNNModel
+
+    init {
+        val modelFile = File(context.filesDir, "knn_model.joblib")
+        val modelBytes = FileInputStream(modelFile).readBytes()
+        val modelText = String(modelBytes)
+        knnModel = KNNModel(modelText)
+    }
+
+    override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+        // Use knnModel for inference
+    }
 }

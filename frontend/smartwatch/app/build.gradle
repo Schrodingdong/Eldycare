@@ -61,6 +61,7 @@ android {
     }
 }
 
+
 dependencies {
 
     def composeBom = platform(libs.androidx.compose.bom)
@@ -98,5 +99,5 @@ dependencies {
 
     implementation libs.androidx.health.services.client
     implementation libs.play.services.wearable
-
 }
+

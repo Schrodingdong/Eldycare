@@ -13,6 +13,7 @@ ktlint = "0.50.0"
 org-jetbrains-kotlin = "1.9.20"
 org-jetbrains-kotlinx = "1.6.0"
 play-services-wearable = "18.1.0"
+tensorflow-lite = "3.7.0"
 
 [libraries]
 android-lint-gradle = "com.android.tools.lint:lint-gradle:31.2.0"
@@ -27,6 +28,7 @@ jacoco-ant = "org.jacoco:org.jacoco.ant:0.8.11"
 junit = "junit:junit:4.13.2"
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "org-jetbrains-kotlin" }
 play-services-wearable = { module = "com.google.android.gms:play-services-wearable", version.ref = "play-services-wearable" }
+tensorflow-lite = { module = "org.tensorflow:tensorflow-lite", version.ref = "tensorflow-lite" }
 test-espresso-core = "androidx.test.espresso:espresso-core:3.5.1"
 test-ext-junit = "androidx.test.ext:junit:1.1.5"
 wear-compose-foundation = { module = "androidx.wear.compose:compose-foundation", version.ref = "androidx-wear-compose" }
