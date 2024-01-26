@@ -6,18 +6,23 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.opengl.Matrix
 import android.util.Log
+import com.google.android.gms.wearable.MessageClient
 import kotlin.math.cos
 import kotlin.math.sin
 
-class VerticalAccelerationSchenanagans: SensorEventListener{
+class VerticalAccelerationSchenanagans(
+    val messageClient : MessageClient
+): SensorEventListener{
     private val NS2S = 1.0f / 1000000000.0f
     private var timestamp: Long = 0L
     private var accelerationValues: FloatArray = floatArrayOf(0f, 0f, 0f)
     private var magneticValues: FloatArray = floatArrayOf(0f, 0f, 0f)
+    private var gravityValues: FloatArray = floatArrayOf(0f, 0f, 0f)
     private var worldRotationMatrixX: FloatArray = floatArrayOf(0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f)
     private var worldRotationMatrixY: FloatArray = floatArrayOf(0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f)
     private var worldRotationMatrixZ: FloatArray = floatArrayOf(0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f)
     private var orientationValues: FloatArray = floatArrayOf(0f, 0f, 0f)
+    private var rotationMatrix: FloatArray = floatArrayOf(0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f)
 
     override fun onSensorChanged(event: SensorEvent) {
         when (event.sensor.type) {
@@ -41,6 +46,7 @@ class VerticalAccelerationSchenanagans: SensorEventListener{
             Sensor.TYPE_GYROSCOPE -> {
                 // Update rotation matrix, which is needed to update orientation angles.
                 val dT = (event.timestamp - timestamp) * NS2S
+                timestamp = event.timestamp
                 var omegaX = event.values[0]
                 var omegaY = event.values[1]
                 var omegaZ = event.values[2]
@@ -51,85 +57,85 @@ class VerticalAccelerationSchenanagans: SensorEventListener{
                 if (omegaY < eps && omegaY > -eps) omegaY = 0f
                 if (omegaZ < eps && omegaZ > -eps) omegaZ = 0f
 
-                // Integrate angular velocities around x, y, and z axes to get the
-                // rotation matrix. thetaX is the rotation angle around x axis, etc.
-                val thetaX = omegaX * dT
-                val thetaY = omegaY * dT
-                val thetaZ = omegaZ * dT
-                val sinThetaX = sin(thetaX)
-                val cosThetaX = cos(thetaX)
-                val rotationMatrixX = floatArrayOf(
+
+                // Calculate the rotation matrix
+                SensorManager.getRotationMatrix(
+                    rotationMatrix,
+                    null,
+                    gravityValues,
+                    magneticValues
+                )
+                SensorManager.getOrientation(rotationMatrix, orientationValues)
+//                Log.d("VerticalAccelerationSchenanagans", "Orientation :  ${orientationValues.contentToString()}")
+                // get acceleration in new world coordinates using orientation
+                val sinX = sin(orientationValues[1])
+                val cosX = cos(orientationValues[1])
+                val sinY = sin(orientationValues[2])
+                val cosY = cos(orientationValues[2])
+//                Log.d("VerticalAccelerationSchenanagans", "XYZ : ${orientationValues.contentToString()}  sinX :  $sinX, cosX : $cosX, sinY : $sinY, cosY : $cosY")
+                // rotation matrix around x axis
+                worldRotationMatrixX = floatArrayOf(
                     1f, 0f, 0f,
-                    0f, cosThetaX, -sinThetaX,
-                    0f, sinThetaX, cosThetaX
+                    0f, cosX, -sinX,
+                    0f, sinX, cosX
                 )
-                val rotationMatrixY = floatArrayOf(
-                    cos(thetaY), 0f, sin(thetaY),
+                // rotation matrix around y axis
+                worldRotationMatrixY = floatArrayOf(
+                    cosY, 0f, sinY,
                     0f, 1f, 0f,
-                    -sin(thetaY), 0f, cos(thetaY)
+                    -sinY, 0f, cosY
                 )
-                val rotationMatrixZ = floatArrayOf(
-                    cos(thetaZ), -sin(thetaZ), 0f,
-                    sin(thetaZ), cos(thetaZ), 0f,
-                    0f, 0f, 1f
-                )
-                SensorManager.getRotationMatrix(
-                    worldRotationMatrixX,
-                    null,
-                    rotationMatrixX,
-                    magneticValues
-                )
-                SensorManager.getRotationMatrix(
-                    worldRotationMatrixY,
-                    null,
-                    rotationMatrixY,
-                    magneticValues
-                )
-                SensorManager.getRotationMatrix(
-                    worldRotationMatrixZ,
-                    null,
-                    rotationMatrixZ,
-                    magneticValues
-                )
-                val rotationMatrixMultiplied = multiplyMatrices(
-                    multiplyMatrices(rotationMatrixX, 3,3 , rotationMatrixY, 3,3),
-                    3,3,
-                    rotationMatrixZ, 3,3
-                )
-//                Log.d("VerticalAccelerationSchenanagans", "Rotation Matrix :  ${rotationMatrix.contentToString()}")
-//                val worldAcceleration = floatArrayOf(0f, 0f, 0f)
-                val worldAcceleration = multiplyMatrixVector(rotationMatrixMultiplied, accelerationValues)
-                Log.d("VerticalAccelerationSchenanagans", "World Acceleration :  ${worldAcceleration.contentToString()}")
-//                Log.d("VerticalAccelerationSchenanagans", "STJB Vertical Acceleration :  ${worldAcceleration[2]}")
+                // multiply rotation matrices
+                val worldRotationMatrix =  multiplyMatrices(worldRotationMatrixX, 3,3,worldRotationMatrixY,3,3)
+                val worldAcceleration = multiplyMatrixVector(worldRotationMatrix, accelerationValues).map { if(it < 0.01) 0f else it }.toFloatArray()
+                val verticalAcceleration = worldAcceleration[2]
+                // todo : check if this is correct
+//                Log.d("VerticalAccelerationSchenanagans", "VerticalAcc : ${worldAcceleration[2]} World Acceleration :  ${worldAcceleration.contentToString()}, accelerationValues : ${accelerationValues.contentToString()}")
+
+                // Integrate acceleration to get vertical velocity
+                val verticalVelocity = verticalAcceleration * dT
+                // Integrate vertical velocity to get vertical position
+                val verticalPosition = verticalVelocity * dT * 1000 // in mm
+                Log.d("VerticalAccelerationSchenanagans", "Verticaly :VerticalPos : $verticalPosition mm, VerticalVel : $verticalVelocity m/s, VerticalAcc : $verticalAcceleration m/s²")
+
+                // do Threshold Based Method on vertical acceleration
+                val threshold = 0.1f
+                if (verticalAcceleration > threshold) {
+                    if (verticalVelocity > threshold) {
+                        if (verticalPosition > threshold) {
+                            // send the data to the handheld
+                            Log.d("VerticalAccelerationSchenanagans", "Fall detected !")
+                            messageClient.sendMessage(
+                                "default_node",
+                                "/message_path",
+                                "fall detected".toByteArray()
+                            ).apply {
+                                addOnSuccessListener {
+                                    Log.d("VerticalAccelerationSchenanagans", "Fall sent !")
+                                }
+                                addOnFailureListener {
+                                    Log.e("VerticalAccelerationSchenanagans", "Failure sending fall message")
+                                }
+                            }
+                        }
+                    }
+                }
+
             }
             Sensor.TYPE_MAGNETIC_FIELD -> {
                 // Update magnetic field values when compass data is received
                 magneticValues[0] = event.values[0]
                 magneticValues[1] = event.values[1]
                 magneticValues[2] = event.values[2]
-//                Log.d("VerticalAccelerationSchenanagans", "Magnetic Field :  ${magneticValues.contentToString()}")
+            }
+            Sensor.TYPE_GRAVITY -> {
+                // Update gravity values when gravity data is received
+                gravityValues[0] = event.values[0]
+                gravityValues[1] = event.values[1]
+                gravityValues[2] = event.values[2]
+//                Log.d("VerticalAccelerationSchenanagans", "Gravity :  ${gravityValues.contentToString()}")
             }
         }
-        // multiply rotation matrix by acceleration values to get acceleration in world coordinates
-        // this is the same as using the accelerometer in world coordinates
-
-
-
-
-//        if (accelerationValues != null && magneticValues != null && rotationMatrix != null) {
-//            // get the rotation matrix
-//            SensorManager.getRotationMatrix(
-//                rotationMatrix,
-//                null,
-//                accelerationValues,
-//                magneticValues
-//            )
-//            // get accelration in world coordinates :
-//            val worldAccel = floatArrayOf(0f, 0f, 0f)
-//            Matrix.multiplyMV(worldAccel, 0, rotationMatrix, 0, accelerationValues, 0)
-//            Log.d("VerticalAccelerationSchenanagans", "World Acceleration :  ${worldAccel.contentToString()}")
-//        }
-//        Log.d("VerticalAccelerationSchenanagans", "=============================================")
 
 
 

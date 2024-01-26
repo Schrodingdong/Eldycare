@@ -47,22 +47,6 @@ import com.google.android.gms.wearable.MessageEvent
 import kotlinx.coroutines.delay
 
 
-
-class MyMessageListener : MessageClient.OnMessageReceivedListener {
-    override fun onMessageReceived(messageEvent: MessageEvent) {
-        val path = messageEvent.path
-        val message = String(messageEvent.data)
-        Log.d("PhoneApp", "Received message with path: $path and content: $message")
-        // Now you can handle the received message as needed.
-    }
-}
-
-
-
-
-
-
-
 /**
  * LOGIN PAGE
  */

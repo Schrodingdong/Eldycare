@@ -18,13 +18,13 @@ class AlertService(val onAlertListChange: (List<Alert>) -> Unit) {
 
     /**
      * Send an alert to the server
-     * @param alertType : the type of the alert
+     * @param alertTypes : the type of the alert
      */
-    fun sendAlert(alertType: List<AlertType>) {
-        val alertTypeString = alertType.joinToString(separator = ";")
+    fun sendAlert(alertTypes: List<AlertType>) {
+        val alertTypeString = alertTypes.joinToString(separator = ";")
         val alert = Alert(
             elderEmail = ApiClient.email,
-            alertMessage = generateAlertMessage(alertType),
+            alertMessage = generateAlertMessage(alertTypes),
             alertType = alertTypeString,
             alertTime = DateTimeFormatter.ofPattern("HH:mm:ss").format(LocalTime.now()),
             alertDate = DateTimeFormatter.ISO_LOCAL_DATE.format(LocalDate.now()),
@@ -47,8 +47,8 @@ class AlertService(val onAlertListChange: (List<Alert>) -> Unit) {
             // send it
             val notif = NotificationModel(
                 elderEmail= ApiClient.email,
-                alertMessage=generateAlertMessage(alertType),
-                alertType=alertType,
+                alertMessage=generateAlertMessage(alertTypes),
+                alertType=alertTypes,
                 alertTime= Instant.now().toString(),
                 location="here"
             )

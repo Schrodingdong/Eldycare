@@ -37,7 +37,7 @@ class ApiClient{
         var userType: UserType = UserType.RELATIVE
         var email: String = ""
         // TODO : change with the ip of your machine (localhost wont work)
-        val HOSTNAME = "192.168.11.173"
+        val HOSTNAME = "192.168.11.195"
         val PORT = "8888"
         val BASE_URL = "http://$HOSTNAME:$PORT/"
         val gson = Gson()
