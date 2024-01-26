@@ -48,7 +48,9 @@ class AnomalyListener (
             Log.d("PhoneApp", "Fall count: $fallCount")
             Log.d("PhoneApp", "Cardiac count: $cardiacCount")
             Log.d("PhoneApp", "Alert types: $alertTypes")
-            if(alertTypes.isNotEmpty()) alertService.sendAlert(alertTypes)
+            if(alertTypes.isNotEmpty()) {
+                alertService.sendAlert(alertTypes)
+            }
             nextStop = 0
             fallCount = 0
             inCoroutine = false

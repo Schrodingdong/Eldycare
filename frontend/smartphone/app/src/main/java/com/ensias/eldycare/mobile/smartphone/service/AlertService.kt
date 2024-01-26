@@ -1,6 +1,8 @@
 package com.ensias.eldycare.mobile.smartphone.service
 
+import android.annotation.SuppressLint
 import android.util.Log
+import com.ensias.eldycare.mobile.smartphone.MainActivity
 import com.ensias.eldycare.mobile.smartphone.api.ApiClient
 import com.ensias.eldycare.mobile.smartphone.data.AlertType
 import com.ensias.eldycare.mobile.smartphone.data.database.Alert
@@ -21,20 +23,24 @@ class AlertService(val onAlertListChange: (List<Alert>) -> Unit) {
      * @param alertTypes : the type of the alert
      */
     fun sendAlert(alertTypes: List<AlertType>) {
-        val alertTypeString = alertTypes.joinToString(separator = ";")
-        val alert = Alert(
-            elderEmail = ApiClient.email,
-            alertMessage = generateAlertMessage(alertTypes),
-            alertType = alertTypeString,
-            alertTime = DateTimeFormatter.ofPattern("HH:mm:ss").format(LocalTime.now()),
-            alertDate = DateTimeFormatter.ISO_LOCAL_DATE.format(LocalDate.now()),
-            location = "here" // TODO : get the location
-        )
         GlobalScope.launch{
+            // get current location
+            val location = getLocation()
+            // create the alert
+            val alertTypeString = alertTypes.joinToString(separator = ";")
+            val alert = Alert(
+                elderEmail = ApiClient.email,
+                alertMessage = generateAlertMessage(alertTypes),
+                alertType = alertTypeString,
+                alertTime = DateTimeFormatter.ofPattern("HH:mm:ss").format(LocalTime.now()),
+                alertDate = DateTimeFormatter.ISO_LOCAL_DATE.format(LocalDate.now()),
+                location = location // TODO : get the location
+            )
+
             // save it Localy
             AlertDatabase.getDbInstance().alertDao.upsertAlert(alert)
 
-            // get the new list
+            // get the new alert list
             val alertList = AlertDatabase.getDbInstance().alertDao.getAlertsByElderEmail(
                 elderEmail = ApiClient.email,
                 limit = 10
@@ -43,14 +49,13 @@ class AlertService(val onAlertListChange: (List<Alert>) -> Unit) {
             // refresh composition
             onAlertListChange(alertList)
 
-
             // send it
             val notif = NotificationModel(
                 elderEmail= ApiClient.email,
                 alertMessage=generateAlertMessage(alertTypes),
                 alertType=alertTypes,
                 alertTime= Instant.now().toString(),
-                location="here"
+                location= location
             )
             Log.d("AlertService", "sendAlert: " + notif.toString())
             val res = NotificationService().sendNotification(notif)
@@ -63,6 +68,19 @@ class AlertService(val onAlertListChange: (List<Alert>) -> Unit) {
             alertMessage += type.toString() + ", "
         }
         return alertMessage
+    }
+
+    @SuppressLint("MissingPermission")
+    fun getLocation() : String {
+        // TODO : POSSIBLE BUG : if the location is not yet available
+        var location = ""
+        MainActivity.fusedLocationClient.lastLocation.addOnSuccessListener{
+            val latitude = it.latitude
+            val longitude = it.longitude
+            location = latitude.toString() + "," + longitude.toString()
+        }
+        while(location == ""){}
+        return location
     }
 
 

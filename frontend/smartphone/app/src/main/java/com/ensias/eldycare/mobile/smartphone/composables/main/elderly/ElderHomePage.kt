@@ -37,10 +37,9 @@ import com.ensias.eldycare.mobile.smartphone.data.database.Alert
 import com.ensias.eldycare.mobile.smartphone.data.model.ReminderCalendarEventModel
 import com.ensias.eldycare.mobile.smartphone.data.model.ReminderModel
 import com.ensias.eldycare.mobile.smartphone.service.AlertService
-import com.ensias.eldycare.mobile.smartphone.service.AnomalyListener
+import com.ensias.eldycare.mobile.smartphone.service.AnomalyWatcherService
 import com.ensias.eldycare.mobile.smartphone.service.ReminderService
 import com.ensias.eldycare.mobile.smartphone.service.content_provider.CalendarProvider
-import com.google.android.gms.wearable.Wearable
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import java.time.LocalDate
 import java.time.LocalTime
@@ -66,9 +65,6 @@ fun ElderHomePage(navController: NavController, context: Context){
     val alertService = AlertService(onAlertListChange = {alertList = it})
 
 
-    // init anomaly listener
-    val anomalyListener = AnomalyListener(alertService)
-    Wearable.getMessageClient(context).addListener(anomalyListener)
 
     // reminder variables
     var showAddReminderPopup by remember { mutableStateOf(false) }
@@ -99,18 +95,24 @@ fun ElderHomePage(navController: NavController, context: Context){
     }
 
 
-    // Start the reminders service
     LaunchedEffect(key1 = null, block = {
+        // Start the reminders service
         ReminderService.onReminderListChange = {reminderList = it}
-        val serviceIntent = Intent(context, ReminderService::class.java)
-        // put variable for the service
-        serviceIntent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
-        context.startService(serviceIntent)
+        val reminderServiceIntent = Intent(context, ReminderService::class.java)
+        reminderServiceIntent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+        context.startService(reminderServiceIntent)
+
+        // start the anomaly watcher service
+        AnomalyWatcherService.alertService = alertService
+        AnomalyWatcherService.context = context
+        val anomalyWatcherServiceIntent = Intent(context, AnomalyWatcherService::class.java)
+        anomalyWatcherServiceIntent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+        context.startService(anomalyWatcherServiceIntent)
     })
 
     LaunchedEffect(Unit){
         // TODO DISABLE THE MOCKS
-//        alertService.mockSendAlert()
+        alertService.mockSendAlert()
 
         // request permissions
         ActivityCompat.requestPermissions(

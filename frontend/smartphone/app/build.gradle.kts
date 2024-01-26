@@ -92,4 +92,7 @@ dependencies {
     // wearable
     implementation("com.google.android.gms:play-services-wearable:18.1.0")
 
+    // location
+    implementation("com.google.android.gms:play-services-location:21.1.0")
+
 }

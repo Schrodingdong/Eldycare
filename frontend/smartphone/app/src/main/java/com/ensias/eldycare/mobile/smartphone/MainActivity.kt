@@ -1,5 +1,7 @@
 package com.ensias.eldycare.mobile.smartphone
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -8,6 +10,7 @@ import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
@@ -25,11 +28,16 @@ import com.ensias.eldycare.mobile.smartphone.data.AlertType
 import com.ensias.eldycare.mobile.smartphone.data.database.AlertDatabase
 import com.ensias.eldycare.mobile.smartphone.service.AlertService
 import com.ensias.eldycare.mobile.smartphone.theme.ComposeTestTheme
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.wearable.MessageClient
 import com.google.android.gms.wearable.MessageEvent
 import com.google.android.gms.wearable.Wearable
 
 class MainActivity : ComponentActivity() {
+    companion object{
+        lateinit var fusedLocationClient: FusedLocationProviderClient
+    }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,6 +46,27 @@ class MainActivity : ComponentActivity() {
         val context = this
         // init database
         AlertDatabase.init(context)
+
+        // location permissions
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ),
+                1
+            )
+        }
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
 
         setContent {
             ComposeTestTheme {
