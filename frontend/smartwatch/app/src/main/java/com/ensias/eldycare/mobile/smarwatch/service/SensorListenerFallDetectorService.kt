@@ -1,17 +1,18 @@
-package com.ensias.eldycare.mobile.smarwatch
+package com.ensias.eldycare.mobile.smarwatch.service
 
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-import android.opengl.Matrix
-import android.util.Log
-import com.google.android.gms.wearable.MessageClient
 import kotlin.math.cos
 import kotlin.math.sin
 
-class VerticalAccelerationSchenanagans(
-    val messageClient : MessageClient
+/**
+ * Listener for the sensors. With fall detection algorithm
+ * @param messageClient the messageClient instance
+ */
+class SensorListenerFallDetectorService(
+    val messageClient: HandheldMessageClient,
 ): SensorEventListener{
     private val NS2S = 1.0f / 1000000000.0f
     private var timestamp: Long = 0L
@@ -66,13 +67,11 @@ class VerticalAccelerationSchenanagans(
                     magneticValues
                 )
                 SensorManager.getOrientation(rotationMatrix, orientationValues)
-//                Log.d("VerticalAccelerationSchenanagans", "Orientation :  ${orientationValues.contentToString()}")
                 // get acceleration in new world coordinates using orientation
                 val sinX = sin(orientationValues[1])
                 val cosX = cos(orientationValues[1])
                 val sinY = sin(orientationValues[2])
                 val cosY = cos(orientationValues[2])
-//                Log.d("VerticalAccelerationSchenanagans", "XYZ : ${orientationValues.contentToString()}  sinX :  $sinX, cosX : $cosX, sinY : $sinY, cosY : $cosY")
                 // rotation matrix around x axis
                 worldRotationMatrixX = floatArrayOf(
                     1f, 0f, 0f,
@@ -89,14 +88,10 @@ class VerticalAccelerationSchenanagans(
                 val worldRotationMatrix =  multiplyMatrices(worldRotationMatrixX, 3,3,worldRotationMatrixY,3,3)
                 val worldAcceleration = multiplyMatrixVector(worldRotationMatrix, accelerationValues).map { if(it < 0.01) 0f else it }.toFloatArray()
                 val verticalAcceleration = worldAcceleration[2]
-                // todo : check if this is correct
-//                Log.d("VerticalAccelerationSchenanagans", "VerticalAcc : ${worldAcceleration[2]} World Acceleration :  ${worldAcceleration.contentToString()}, accelerationValues : ${accelerationValues.contentToString()}")
 
-                // Integrate acceleration to get vertical velocity
+                // Integration
                 val verticalVelocity = verticalAcceleration * dT
-                // Integrate vertical velocity to get vertical position
                 val verticalPosition = verticalVelocity * dT * 1000 // in mm
-                Log.d("VerticalAccelerationSchenanagans", "Verticaly :VerticalPos : $verticalPosition mm, VerticalVel : $verticalVelocity m/s, VerticalAcc : $verticalAcceleration m/s²")
 
                 // do Threshold Based Method on vertical acceleration
                 val threshold = 0.1f
@@ -104,19 +99,7 @@ class VerticalAccelerationSchenanagans(
                     if (verticalVelocity > threshold) {
                         if (verticalPosition > threshold) {
                             // send the data to the handheld
-                            Log.d("VerticalAccelerationSchenanagans", "Fall detected !")
-                            messageClient.sendMessage(
-                                "default_node",
-                                "/message_path",
-                                "fall detected".toByteArray()
-                            ).apply {
-                                addOnSuccessListener {
-                                    Log.d("VerticalAccelerationSchenanagans", "Fall sent !")
-                                }
-                                addOnFailureListener {
-                                    Log.e("VerticalAccelerationSchenanagans", "Failure sending fall message")
-                                }
-                            }
+                            messageClient.sendMessage("fall detected")
                         }
                     }
                 }
@@ -133,7 +116,6 @@ class VerticalAccelerationSchenanagans(
                 gravityValues[0] = event.values[0]
                 gravityValues[1] = event.values[1]
                 gravityValues[2] = event.values[2]
-//                Log.d("VerticalAccelerationSchenanagans", "Gravity :  ${gravityValues.contentToString()}")
             }
         }
 
@@ -141,9 +123,8 @@ class VerticalAccelerationSchenanagans(
 
     }
 
-    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-        // Handle accuracy changes if needed
-    }
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
+
     fun multiplyMatrixVector(matrix: FloatArray, vector: FloatArray): FloatArray {
         val matrixRows = matrix.size / vector.size
         require(matrix.size % vector.size == 0) { "Invalid matrix and vector dimensions for multiplication" }
@@ -174,7 +155,6 @@ class VerticalAccelerationSchenanagans(
                 result[i * numColsB + j] = sum
             }
         }
-
         return result
     }
 }
