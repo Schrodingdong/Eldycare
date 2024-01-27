@@ -22,13 +22,6 @@ To configure AWS for the project run:
 aws configure
 ```
 
-Use the following credentials:
-
-```
-Access key: AKIA2FFRIWPI57TWEN7J
-Secret access key: 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
-```
-
 Also to configure kubectl to use the EKS cluster run :
 
 ```
