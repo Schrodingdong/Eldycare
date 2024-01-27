@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Github Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up JDK 21
         uses: actions/setup-java@v3
@@ -189,7 +189,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up AWS CLI
         uses: aws-actions/configure-aws-credentials@v2
@@ -216,7 +216,7 @@ jobs:
     needs: [create-eks-cluster, push-to-dockerhub-discovery-service]
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up AWS CLI
         uses: aws-actions/configure-aws-credentials@v2
@@ -242,7 +242,7 @@ jobs:
     needs: [create-eks-cluster, push-to-dockerhub-api-gateway-service]
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up AWS CLI
         uses: aws-actions/configure-aws-credentials@v2
@@ -268,7 +268,7 @@ jobs:
     needs: [create-eks-cluster, push-to-dockerhub-authentication-service, deploy-postgres-service, deploy-rabbitmq-service]
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up AWS CLI
         uses: aws-actions/configure-aws-credentials@v2
@@ -294,7 +294,7 @@ jobs:
     needs: [create-eks-cluster, push-to-dockerhub-user-service, deploy-neo4j-service, deploy-rabbitmq-service]
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up AWS CLI
         uses: aws-actions/configure-aws-credentials@v2
@@ -320,7 +320,7 @@ jobs:
     needs: [create-eks-cluster, push-to-dockerhub-notification-service, deploy-mongodb-notification-service, deploy-rabbitmq-service]
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up AWS CLI
         uses: aws-actions/configure-aws-credentials@v2
@@ -346,7 +346,7 @@ jobs:
     needs: [create-eks-cluster, push-to-dockerhub-reminder-service, deploy-mongodb-reminder-service]
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up AWS CLI
         uses: aws-actions/configure-aws-credentials@v2
@@ -372,7 +372,7 @@ jobs:
     needs: [create-eks-cluster]
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up AWS CLI
         uses: aws-actions/configure-aws-credentials@v2
@@ -398,7 +398,7 @@ jobs:
     needs: [create-eks-cluster]
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up AWS CLI
         uses: aws-actions/configure-aws-credentials@v2
@@ -424,7 +424,7 @@ jobs:
     needs: [create-eks-cluster]
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up AWS CLI
         uses: aws-actions/configure-aws-credentials@v2
@@ -450,7 +450,7 @@ jobs:
     needs: [create-eks-cluster]
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up AWS CLI
         uses: aws-actions/configure-aws-credentials@v2
@@ -476,7 +476,7 @@ jobs:
     needs: [create-eks-cluster]
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up AWS CLI
         uses: aws-actions/configure-aws-credentials@v2
