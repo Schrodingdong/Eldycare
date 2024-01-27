@@ -3,12 +3,11 @@ name: eldycare backend CICD
 on:
   workflow_dispatch:
   push:
-    branches: ["master"]
+    branches: ["main"]
     paths: "backend/**"
   pull_request:
-    branches: ["master"]
+    branches: ["main"]
     paths: "backend/**"
-
 
 jobs:
   build-microservices:
@@ -35,29 +34,17 @@ jobs:
           name: api-gateway-service
           path: ./backend/api-gateway-service
 
-      - name: upload Artifacts for authentication-service
-        uses: actions/upload-artifact@v4.0.0
-        with:
-          name: authentication-service
-          path: ./backend/authentication-service
-
       - name: upload Artifacts for discovery-service
         uses: actions/upload-artifact@v4.0.0
         with:
           name: discovery-service
           path: ./backend/discovery-service
-      
-      - name: upload Artifacts for notification-service
+
+      - name: upload Artifacts for authentication-service
         uses: actions/upload-artifact@v4.0.0
         with:
-          name: notification-service
-          path: ./backend/notification-service
-      
-      - name: upload Artifacts for reminder-service
-        uses: actions/upload-artifact@v4.0.0
-        with:
-          name: reminder-service
-          path: ./backend/reminder-service
+          name: authentication-service
+          path: ./backend/authentication-service
 
       - name: upload Artifacts for user-service
         uses: actions/upload-artifact@v4.0.0
@@ -65,26 +52,18 @@ jobs:
           name: user-service
           path: ./backend/user-service
 
-  push-to-dockerhub-api-gateway-service:
-    name: push-to-dockerhub-api-gateway-service
-    runs-on: ubuntu-latest
-    needs: build-microservices
-    steps:
-      - name: Download Artifacts
-        uses: actions/download-artifact@v4
+      - name: upload Artifacts for notification-service
+        uses: actions/upload-artifact@v4.0.0
         with:
-          name: api-gateway-service
-      - name: List contents of the folders
-        run: ls -R
-      - name: Build & push Docker image api-gateway-service
-        uses: mr-smithers-excellent/docker-build-push@v6
-        with:
-          image: schrodingdong/eldycare-api-gateway-service
-          tags: latest
-          registry: docker.io
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          name: notification-service
+          path: ./backend/notification-service
 
+      - name: upload Artifacts for reminder-service
+        uses: actions/upload-artifact@v4.0.0
+        with:
+          name: reminder-service
+          path: ./backend/reminder-service
+          
   push-to-dockerhub-discovery-service:
     name: push-to-dockerhub-discovery-service
     runs-on: ubuntu-latest
@@ -104,7 +83,27 @@ jobs:
           registry: docker.io
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-
+    
+  push-to-dockerhub-api-gateway-service:
+    name: push-to-dockerhub-api-gateway-service
+    runs-on: ubuntu-latest
+    needs: build-microservices
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: api-gateway-service
+      - name: List contents of the folders
+        run: ls -R
+      - name: Build & push Docker image api-gateway-service
+        uses: mr-smithers-excellent/docker-build-push@v6
+        with:
+          image: schrodingdong/eldycare-api-gateway-service
+          tags: latest
+          registry: docker.io
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+    
   push-to-dockerhub-authentication-service:
     name: push-to-dockerhub-authentication-service
     runs-on: ubuntu-latest
@@ -125,6 +124,26 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+  push-to-dockerhub-user-service:
+    name: push-to-dockerhub-user-service
+    runs-on: ubuntu-latest
+    needs: build-microservices
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: user-service
+      - name: List contents of the folders
+        run: ls -R
+      - name: Build & push Docker image user-service
+        uses: mr-smithers-excellent/docker-build-push@v6
+        with:
+          image: schrodingdong/eldycare-user-service
+          tags: latest
+          registry: docker.io
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+  
   push-to-dockerhub-notification-service:
     name: push-to-dockerhub-notification-service
     runs-on: ubuntu-latest
@@ -165,22 +184,314 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-  push-to-dockerhub-user-service:
-    name: push-to-dockerhub-user-service
+  create-eks-cluster:
+    name: Create EKS Cluster
     runs-on: ubuntu-latest
-    needs: build-microservices
     steps:
-      - name: Download Artifacts
-        uses: actions/download-artifact@v4
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v2
         with:
-          name: user-service
-      - name: List contents of the folders
-        run: ls -R
-      - name: Build & push Docker image user-service
-        uses: mr-smithers-excellent/docker-build-push@v6
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: "us-east-1"
+
+      - name: Check if EKS cluster exists
+        run: |
+          eks_cluster_name="eldycare-cluster"
+          if aws eks describe-cluster --region us-east-1 --name $eks_cluster_name 2>/dev/null; then
+            echo "EKS cluster $eks_cluster_name already exists."
+          else
+            echo "EKS cluster $eks_cluster_name does not exist. Creating..."
+            cd backend/terraform
+            terraform init
+            terraform apply -auto-approve
+          fi
+
+  deploy-discovery-service:
+    name: Deploy Discovery Service to EKS
+    runs-on: ubuntu-latest
+    needs: [create-eks-cluster, push-to-dockerhub-discovery-service]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v2
         with:
-          image: schrodingdong/eldycare-user-service
-          tags: latest
-          registry: docker.io
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: "us-east-1"
+
+      - name: Configure kubectl for EKS
+        run: |
+          aws eks --region us-east-1 update-kubeconfig --name eldycare-cluster
+
+      - name: Deploy Discovery Service to EKS
+        run: |
+          cd backend/k8s/discovery-service
+
+          kubectl apply -f discovery-service-deployment.yaml
+          kubectl apply -f discovery-service.yaml
+    
+  deploy-api-gateway-service:
+    name: Deploy API Gateway Service to EKS
+    runs-on: ubuntu-latest
+    needs: [create-eks-cluster, push-to-dockerhub-api-gateway-service]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: "us-east-1"
+
+      - name: Configure kubectl for EKS
+        run: |
+          aws eks --region us-east-1 update-kubeconfig --name eldycare-cluster
+
+      - name: Deploy API Gateway Service to EKS
+        run: |
+          cd backend/k8s/api-gateway-service
+
+          kubectl apply -f api-gateway-service-deployment.yaml
+          kubectl apply -f api-gateway-service.yaml
+
+  deploy-authentication-service:
+    name: Deploy Authentication Service to EKS
+    runs-on: ubuntu-latest
+    needs: [create-eks-cluster, push-to-dockerhub-authentication-service, deploy-postgres-service, deploy-rabbitmq-service]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: "us-east-1"
+
+      - name: Configure kubectl for EKS
+        run: |
+          aws eks --region us-east-1 update-kubeconfig --name eldycare-cluster
+
+      - name: Deploy Authentication Service to EKS
+        run: |
+          cd backend/k8s/authentication-service
+
+          kubectl apply -f authentication-service-deployment.yaml
+          kubectl apply -f authentication-service.yaml
+
+  deploy-user-service:
+    name: Deploy User Service to EKS
+    runs-on: ubuntu-latest
+    needs: [create-eks-cluster, push-to-dockerhub-user-service, deploy-neo4j-service, deploy-rabbitmq-service]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: "us-east-1"
+
+      - name: Configure kubectl for EKS
+        run: |
+          aws eks --region us-east-1 update-kubeconfig --name eldycare-cluster
+
+      - name: Deploy User Service to EKS
+        run: |
+          cd backend/k8s/user-service
+
+          kubectl apply -f user-service-deployment.yaml
+          kubectl apply -f user-service.yaml
+
+  deploy-notification-service:
+    name: Deploy Notification Service to EKS
+    runs-on: ubuntu-latest
+    needs: [create-eks-cluster, push-to-dockerhub-notification-service, deploy-mongodb-notification-service, deploy-rabbitmq-service]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: "us-east-1"
+
+      - name: Configure kubectl for EKS
+        run: |
+          aws eks --region us-east-1 update-kubeconfig --name eldycare-cluster
+
+      - name: Deploy Notification Service to EKS
+        run: |
+          cd backend/k8s/notification-service
+
+          kubectl apply -f notification-service-deployment.yaml
+          kubectl apply -f notification-service.yaml
+
+  deploy-reminder-service:
+    name: Deploy Reminder Service to EKS
+    runs-on: ubuntu-latest
+    needs: [create-eks-cluster, push-to-dockerhub-reminder-service, deploy-mongodb-reminder-service]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: "us-east-1"
+
+      - name: Configure kubectl for EKS
+        run: |
+          aws eks --region us-east-1 update-kubeconfig --name eldycare-cluster
+
+      - name: Deploy Reminder Service to EKS
+        run: |
+          cd backend/k8s/reminder-service
+
+          kubectl apply -f reminder-service-deployment.yaml
+          kubectl apply -f reminder-service.yaml
+
+  deploy-mongodb-notification-service:
+    name: Deploy MongoDB Notification Service to EKS
+    runs-on: ubuntu-latest
+    needs: [create-eks-cluster]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: "us-east-1"
+
+      - name: Configure kubectl for EKS
+        run: |
+          aws eks --region us-east-1 update-kubeconfig --name eldycare-cluster
+
+      - name: Deploy MongoDB Notification Service to EKS
+        run: |
+          cd backend/k8s/mongodb-notification
+
+          kubectl apply -f mongodb-notification-deployment.yaml
+          kubectl apply -f mongodb-notification-service.yaml
+
+  deploy-postgres-service:
+    name: Deploy Postgres Service to EKS
+    runs-on: ubuntu-latest
+    needs: [create-eks-cluster]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: "us-east-1"
+
+      - name: Configure kubectl for EKS
+        run: |
+          aws eks --region us-east-1 update-kubeconfig --name eldycare-cluster
+
+      - name: Deploy Postgres Service to EKS
+        run: |
+          cd backend/k8s/postgres
+
+          kubectl apply -f postgres-deployment.yaml
+          kubectl apply -f postgres-service.yaml
+
+  deploy-mongodb-reminder-service:
+    name: Deploy MongoDB Reminder Service to EKS
+    runs-on: ubuntu-latest
+    needs: [create-eks-cluster]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: "us-east-1"
+
+      - name: Configure kubectl for EKS
+        run: |
+          aws eks --region us-east-1 update-kubeconfig --name eldycare-cluster
+
+      - name: Deploy MongoDB Reminder Service to EKS
+        run: |
+          cd backend/k8s/mongodb-reminder
+
+          kubectl apply -f mongodb-reminder-deployment.yaml
+          kubectl apply -f mongodb-reminder-service.yaml
+          
+  deploy-neo4j-service:
+    name: Deploy Neo4j Service to EKS
+    runs-on: ubuntu-latest
+    needs: [create-eks-cluster]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: "us-east-1"
+
+      - name: Configure kubectl for EKS
+        run: |
+          aws eks --region us-east-1 update-kubeconfig --name eldycare-cluster
+
+      - name: Deploy Neo4j Service to EKS
+        run: |
+          cd backend/k8s/neo4j
+
+          kubectl apply -f neo4j-deployment.yaml
+          kubectl apply -f neo4j-service.yaml
+
+  deploy-rabbitmq-service:
+    name: Deploy RabbitMQ Service to EKS
+    runs-on: ubuntu-latest
+    needs: [create-eks-cluster]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: "us-east-1"
+
+      - name: Configure kubectl for EKS
+        run: |
+          aws eks --region us-east-1 update-kubeconfig --name eldycare-cluster
+
+      - name: Deploy RabbitMQ Service to EKS
+        run: |
+          cd backend/k8s/rabbitmq
+
+          kubectl apply -f rabbitmq-deployment.yaml
+          kubectl apply -f rabbitmq-service.yaml

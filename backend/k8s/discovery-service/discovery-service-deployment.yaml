@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: discovery-service
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: discovery-service
+  template:
+    metadata:
+      labels:
+        app: discovery-service
+    spec:
+      containers:
+        - name: discovery-service
+          image: schrodingdong/eldycare-discovery-service:latest
+          ports:
+            - containerPort: 8761
+          env:
+          - name: container_discovery
+            value: "discovery-service"

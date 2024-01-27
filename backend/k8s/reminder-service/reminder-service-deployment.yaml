@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reminder-service
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: reminder-service
+  template:
+    metadata:
+      labels:
+        app: reminder-service
+    spec:
+      containers:
+        - name: reminder-service
+          image: schrodingdong/eldycare-reminder-service:latest
+          ports:
+            - containerPort: 8083
+          env:
+          - name: container_discovery
+            value: "discovery-service"
+          - name: MongoDB_USERNAME
+            value: "mongo"
+          - name: MongoDB_PASSWORD
+            value: "mongo"
+          - name: MongoDB_DATABASE
+            value: "reminders"
+          - name: MongoDB_CLUSTER_HOST
+            value: "mongodb-reminder-service"
+          - name: MongoDB_CLUSTER_PORT
+            value: "27018"

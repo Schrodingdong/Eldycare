@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-service
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: notification-service
+  template:
+    metadata:
+      labels:
+        app: notification-service
+    spec:
+      containers:
+        - name: notification-service
+          image: schrodingdong/eldycare-notification-service:latest
+          ports:
+            - containerPort: 8082
+          env:
+          - name: container_discovery
+            value: "discovery-service"
+          - name: MongoDB_USERNAME
+            value: "mongo"
+          - name: MongoDB_PASSWORD
+            value: "mongo"
+          - name: MongoDB_DATABASE
+            value: "notifications"
+          - name: MongoDB_CLUSTER_HOST
+            value: "mongodb-notification-service"
+          - name: MongoDB_CLUSTER_PORT
+            value: "27017"
+          - name: RABBITMQ_HOST
+            value: "rabbitmq-service"
+          - name: RABBITMQ_PORT
+            value: "5672"

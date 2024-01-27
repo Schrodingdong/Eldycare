@@ -1,0 +1,13 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: eldycare-cluster
+  region: us-east-1
+
+nodeGroups:
+  - name: eks-nodes
+    desiredCapacity: 20
+    instancesDistribution:
+      maxPrice: 0.066
+      instanceTypes: ["t2.micro", "t3.micro"]

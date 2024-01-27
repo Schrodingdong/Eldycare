@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authentication-service
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: authentication-service
+  template:
+    metadata:
+      labels:
+        app: authentication-service
+    spec:
+      containers:
+        - name: authentication-service
+          image: schrodingdong/eldycare-authentication-service:latest
+          ports:
+            - containerPort: 8084
+          env:
+          - name: container_discovery
+            value: "discovery-service"
+          - name: POSTGRES_DB
+            value: "eldycare"
+          - name: POSTGRES_USER
+            value: "postgres"
+          - name: POSTGRES_PASSWORD
+            value: "postgres"
+          - name: POSTGRES_HOST
+            value: "postgres-service"
+          - name: POSTGRES_PORT
+            value: "5432"
+          - name: RABBITMQ_HOST
+            value: "rabbitmq-service"
+          - name: RABBITMQ_PORT
+            value: "5672"

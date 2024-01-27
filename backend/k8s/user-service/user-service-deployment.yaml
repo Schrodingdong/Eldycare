@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: user-service
+  template:
+    metadata:
+      labels:
+        app: user-service
+    spec:
+      containers:
+        - name: user-service
+          image: schrodingdong/eldycare-user-service:latest
+          ports:
+            - containerPort: 8081
+          env:
+          - name: container_discovery
+            value: "discovery-service"
+          - name: NEO4J_URI
+            value: "bolt://neo4j-service:7687"
+          - name: NEO4J_USERNAME
+            value: "neo4j"
+          - name: NEO4J_PASSWORD
+            value: "saga-pablo-lagoon-java-license-4169"
+          - name: RABBITMQ_HOST
+            value: "rabbitmq-service"
+          - name: RABBITMQ_PORT
+            value: "5672"

@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongodb-reminder-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb-reminder-service
+  template:
+    metadata:
+      labels:
+        app: mongodb-reminder-service
+    spec:
+      containers:
+        - name: mongodb-reminder-service
+          image: mongo:latest
+          ports:
+            - containerPort: 27017
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              value: mongo
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              value: mongo
