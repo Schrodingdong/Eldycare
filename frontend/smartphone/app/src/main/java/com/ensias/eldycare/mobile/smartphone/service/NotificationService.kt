@@ -10,9 +10,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.IBinder
 import android.util.Log
-import android.view.LayoutInflater
 import android.widget.RemoteViews
-import android.widget.TextView
 import androidx.core.app.NotificationCompat
 import com.ensias.eldycare.mobile.smartphone.api.ApiClient
 import com.ensias.eldycare.mobile.smartphone.api.websocket.NotificationWebsocketClient
@@ -44,17 +42,18 @@ class NotificationService : Service(){
             notificationMessage.alertMessage
         )
 
+        // alert message ===========================================================================
         val notificationLongString =
             "${notificationMessage.alertMessage}\n" +
-            "Alert Time: ${notificationMessage.alertTime}\n" +
-            "Location: ${notificationMessage.location}\n"
+            "Alert Time: ${notificationMessage.alertTime}\n"
+//          "Location: ${notificationMessage.location}\n"
         customViewLarge.setTextViewText(
             com.ensias.eldycare.mobile.R.id.notificationText,
             notificationLongString
         )
 
 
-        // init badges
+        // init badges =============================================================================
         notificationMessage.alertType.forEach {
             val badge = RemoteViews(packageName, com.ensias.eldycare.mobile.R.layout.alert_type_badge_layout)
             badge.setTextViewText(
@@ -67,17 +66,38 @@ class NotificationService : Service(){
             )
         }
 
-        // Create an Intent to make a call
+        // Create an Intent to make a call =========================================================
         val callIntent = Intent(Intent.ACTION_DIAL)
-        if(notificationMessage.elderEmail != null)
+        if(notificationMessage.elderEmail != null){
             ConnectionService.connectionList.find { it.email == notificationMessage.elderEmail }?.let {
                 callIntent.data = Uri.parse("tel:${it.phone}")
             }
-        else
+        }
+        else{
             callIntent.data = Uri.parse("tel:00000000000")
+        }
         val callPendingIntent = PendingIntent.getActivity(this, 0, callIntent, PendingIntent.FLAG_UPDATE_CURRENT)
 
-        // initialize notification builder
+        // set the call button to make the call
+        customViewLarge.setOnClickPendingIntent(
+            com.ensias.eldycare.mobile.R.id.call_text_button,
+            callPendingIntent
+        )
+
+        // open Google Maps with coordinates =======================================================
+        val gmmIntentUri = Uri.parse("geo:${notificationMessage.location}?z=20");
+        val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+        mapIntent.setPackage("com.google.android.apps.maps");
+        val mapPendingIntent = PendingIntent.getActivity(this, 0, mapIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+
+        // set the map button to open google maps
+        customViewLarge.setOnClickPendingIntent(
+            com.ensias.eldycare.mobile.R.id.map_text_button,
+            mapPendingIntent
+        )
+
+
+        // initialize notification builder =========================================================
         val builder = NotificationCompat.Builder(this, Constants.CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_dialog_alert)
             .setPriority(NotificationCompat.PRIORITY_HIGH) // Adjust priority as needed
@@ -85,7 +105,7 @@ class NotificationService : Service(){
             .setCustomContentView(customView)
             .setCustomBigContentView(customViewLarge)
             .setSilent(false)
-            .setContentIntent(callPendingIntent)
+//            .setContentIntent(callPendingIntent)
             .setAutoCancel(true)
 
         notificationManager.notify(666, builder.build())

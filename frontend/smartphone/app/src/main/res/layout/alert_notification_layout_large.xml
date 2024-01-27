@@ -44,9 +44,34 @@
             android:id="@+id/badge_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="end"
             android:orientation="horizontal">
 
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/call_text_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:textFontWeight="500"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:background="@android:color/transparent"
+                android:text="CALL"/>
+            <Button
+                android:id="@+id/map_text_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:background="@android:color/transparent"
+                android:textFontWeight="500"
+                android:textStyle="bold"
+                android:textSize="17sp"
+                android:text="MAP"/>
         </LinearLayout>
     </LinearLayout>
 
