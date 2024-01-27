@@ -30,7 +30,7 @@ aws eks --region us-east-1 update-kubeconfig --name eldycare-cluster
 And to list services, run:
 
 ```
-kubctl aws get services
+kubectl get services
 ```
 
 For logs, run:
