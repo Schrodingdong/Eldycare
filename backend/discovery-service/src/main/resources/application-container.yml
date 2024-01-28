@@ -4,3 +4,5 @@ eureka:
     register-with-eureka: false
     service-url:
       defaultZone: http://${container_discovery}:8761/eureka
+  instance:
+    preferIpAddress: true

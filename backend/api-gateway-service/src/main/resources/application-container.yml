@@ -4,6 +4,8 @@ eureka:
     fetch-registry: true
     service-url:
       defaultZone: http://${container_discovery}:8761/eureka/
+  instance:
+    preferIpAddress: true
 
 spring:
   rabbitmq:
